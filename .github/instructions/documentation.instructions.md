@@ -2,13 +2,13 @@
 description: "Use when writing or reviewing JSDoc comments, README files, or inline documentation for TypeScript/React code."
 applyTo: "**/*.{ts,tsx}"
 ---
-# Documentation Standards
+# Padrões de Documentação
 
-## Inline Documentation
+## Documentação Inline
 
-- Add JSDoc comments to **exported** functions, types, and components.
-- Skip documentation for obvious, self-documenting code — prefer clear naming over comments.
-- Use `@param`, `@returns`, and `@example` tags for non-trivial functions.
+- Adicione comentários JSDoc a funções, tipos e componentes **exportados**.
+- Não documente código óbvio e autodescritivo — prefira nomes claros a comentários.
+- Use as tags `@param`, `@returns` e `@example` em funções não triviais.
 
 ```typescript
 /**
@@ -20,13 +20,13 @@ applyTo: "**/*.{ts,tsx}"
 export function mergeMessages(messages: ProviderMessage[]): ChatMessage[] {
 ```
 
-## Component Documentation
+## Documentação de Componentes
 
-- Document component purpose and key props at the top via JSDoc.
-- Use TypeScript prop types as the primary documentation — keep prop names descriptive.
+- Documente o propósito do componente e as props principais via JSDoc no topo do arquivo.
+- Use os tipos TypeScript das props como documentação primária — mantenha nomes de props descritivos.
 
-## Comments
+## Comentários
 
-- Explain **why**, not **what** — the code shows what it does.
-- Use `// TODO:` for planned improvements and `// HACK:` for temporary workarounds.
-- Remove commented-out code — rely on git history instead.
+- Explique o **porquê**, não o **o quê** — o código já mostra o que faz.
+- Use `// TODO:` para melhorias planejadas e `// HACK:` para gambiarras temporárias.
+- Remova código comentado — dependa do histórico do git.

@@ -1,46 +1,46 @@
 ---
 description: "Use when designing components, organizing files, or structuring features in a Next.js App Router project. Covers architecture patterns and project structure."
 ---
-# Architecture Patterns
+# Padrões de Arquitetura
 
-## Project Structure
+## Estrutura de Pastas
 
-Organize by feature, not by type:
+Organize por funcionalidade, não por tipo:
 
 ```
 src/
-  app/                  # Next.js App Router pages and layouts
+  app/                  # Páginas e layouts do App Router do Next.js
   components/
-    ui/                 # Reusable, presentational components (buttons, inputs)
-    features/           # Feature-specific composed components
-  hooks/                # Shared custom hooks
-  lib/                  # Utilities, helpers, external service wrappers
-  types/                # Shared type definitions
-  services/             # API clients, data access layers
+    ui/                 # Componentes reutilizáveis e apresentacionais (botões, inputs)
+    features/           # Componentes compostos específicos de cada feature
+  hooks/                # Custom hooks compartilhados
+  lib/                  # Utilitários, helpers, wrappers de serviços externos
+  types/                # Definições de tipos compartilhados
+  services/             # Clientes de API e camadas de acesso a dados
 ```
 
-## Component Architecture
+## Arquitetura de Componentes
 
-- **Presentational components** — receive data via props, render UI, no side effects.
-- **Container components** — compose presentational components, manage state and effects.
-- **Server components** (default) — fetch data at the server level when possible.
-- **Client components** — use `'use client'` only for interactivity (event handlers, hooks, browser APIs).
+- **Componentes apresentacionais** — recebem dados via props, renderizam UI, sem efeitos colaterais.
+- **Componentes container** — compõem componentes apresentacionais, gerenciam estado e efeitos.
+- **Server components** (padrão) — busque dados no servidor sempre que possível.
+- **Client components** — use `'use client'` apenas para interatividade (event handlers, hooks, APIs do browser).
 
-## Composition Patterns
+## Padrões de Composição
 
-- Prefer **render props** or **children-as-function** over HOCs.
-- Use **custom hooks** to share stateful logic between components.
-- Compose complex UIs from small, single-purpose components.
-- Use the **compound component** pattern for related component groups (e.g., `Tabs`, `Tabs.List`, `Tabs.Panel`).
+- Prefira **render props** ou **children-as-function** a HOCs.
+- Use **custom hooks** para compartilhar lógica com estado entre componentes.
+- Componha UIs complexas a partir de componentes pequenos e de responsabilidade única.
+- Use o padrão **compound component** para grupos de componentes relacionados (ex.: `Tabs`, `Tabs.List`, `Tabs.Panel`).
 
-## Data Flow
+## Fluxo de Dados
 
-- Keep state as close to where it's used as possible.
-- Lift state up only when siblings need to share it.
-- Use React Context sparingly — prefer props and composition first.
-- For server data, use Next.js data fetching (Server Components, `fetch` with caching).
+- Mantenha o estado o mais próximo possível de onde é usado.
+- Eleve o estado apenas quando componentes irmãos precisarem compartilhá-lo.
+- Use React Context com moderação — prefira props e composição primeiro.
+- Para dados do servidor, use o data fetching do Next.js (Server Components, `fetch` com cache).
 
 ## Error Boundaries
 
-- Wrap feature sections with error boundaries to contain failures.
-- Use Next.js `error.tsx` convention for route-level error handling.
+- Envolva seções de feature com error boundaries para isolar falhas.
+- Use a convenção `error.tsx` do Next.js para tratamento de erros por rota.
