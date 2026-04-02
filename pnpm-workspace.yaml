@@ -1,6 +1,10 @@
-packages: []
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
 
 onlyBuiltDependencies:
+  - esbuild
   - msw
   - sharp
   - unrs-resolver

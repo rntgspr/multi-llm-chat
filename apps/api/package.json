@@ -1,0 +1,26 @@
+{
+  "name": "@multi-llm/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "check": "biome check --write ."
+  },
+  "dependencies": {
+    "@multi-llm/interaction": "workspace:*",
+    "@multi-llm/interpretation": "workspace:*",
+    "@multi-llm/maintenance": "workspace:*",
+    "@multi-llm/types": "workspace:*",
+    "hono": "^4.12.9",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "@hono/node-server": "^1.19.12",
+    "@types/node": "^20",
+    "tsx": "^4.21.0"
+  }
+}

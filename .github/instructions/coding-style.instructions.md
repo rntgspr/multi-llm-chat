@@ -43,3 +43,10 @@ applyTo: "**/*.{ts,tsx}"
 - **Types/Interfaces**: `PascalCase`, sem prefixo `I`.
 - **Constantes**: `UPPER_SNAKE_CASE` para constantes verdadeiras; `camelCase` para valores derivados.
 - **Booleanos**: prefixo `is`, `has`, `should`, `can` (ex.: `isLoading`, `hasError`).
+
+## Linting e Formatação
+
+- Todo código deve passar pelo **Biome** antes de ser commitado.
+- Execute `pnpm biome check --write` para corrigir automaticamente problemas de lint e formatação.
+- O Biome valida arquivos `*.{js,jsx,ts,tsx,json,jsonc}`.
+- Configurações do Biome estão em `biome.json` na raiz do projeto.

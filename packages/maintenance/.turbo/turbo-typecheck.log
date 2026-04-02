@@ -1,0 +1,4 @@
+
+> @multi-llm/maintenance@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/maintenance
+> tsc --noEmit
+

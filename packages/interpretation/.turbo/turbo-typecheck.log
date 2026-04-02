@@ -1,0 +1,4 @@
+
+> @multi-llm/interpretation@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/interpretation
+> tsc --noEmit
+

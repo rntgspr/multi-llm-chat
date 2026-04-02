@@ -1,0 +1,22 @@
+{
+  "name": "@multi-llm/workers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "check": "biome check --write ."
+  },
+  "dependencies": {
+    "@multi-llm/interaction": "workspace:*",
+    "@multi-llm/interpretation": "workspace:*",
+    "@multi-llm/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.21.0"
+  }
+}
