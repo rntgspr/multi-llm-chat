@@ -4,13 +4,13 @@ import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { ArrowLeft, Loader2 } from 'lucide-react'
-import { ListaMensagens } from './lista-mensagens'
-import { InputMensagem } from './input-mensagem'
-import { PainelLateral } from './painel-lateral'
+import { MessageList } from './message-list'
+import { MessageInput } from './message-input'
+import { SidePanel } from './side-panel'
 import { useWebSocket } from '@/hooks/use-websocket'
-import type { Sala } from '@/types'
+import type { Room } from '@/types'
 
-interface Usuario {
+interface User {
   id: string
   name?: string | null
   email?: string | null
@@ -18,37 +18,37 @@ interface Usuario {
 }
 
 interface ChatContainerProps {
-  salaId: string
-  usuario: Usuario
+  roomId: string
+  user: User
 }
 
-async function buscarSala(salaId: string): Promise<{ sala: Sala }> {
-  const resposta = await fetch(`/api/salas/${salaId}`)
-  if (!resposta.ok) {
-    throw new Error('Sala não encontrada')
+async function fetchRoom(roomId: string): Promise<{ room: Room }> {
+  const response = await fetch(`/api/rooms/${roomId}`)
+  if (!response.ok) {
+    throw new Error('Room not found')
   }
-  return resposta.json()
+  return response.json()
 }
 
-export function ChatContainer({ salaId, usuario }: ChatContainerProps) {
-  const { conectado, entrarSala, sairSala } = useWebSocket(usuario.id)
+export function ChatContainer({ roomId, user }: ChatContainerProps) {
+  const { connected, joinRoom, leaveRoom } = useWebSocket(user.id)
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['sala', salaId],
-    queryFn: () => buscarSala(salaId),
+    queryKey: ['room', roomId],
+    queryFn: () => fetchRoom(roomId),
   })
 
   useEffect(() => {
-    if (conectado) {
-      entrarSala(salaId)
+    if (connected) {
+      joinRoom(roomId)
     }
 
     return () => {
-      if (conectado) {
-        sairSala(salaId)
+      if (connected) {
+        leaveRoom(roomId)
       }
     }
-  }, [conectado, salaId, entrarSala, sairSala])
+  }, [connected, roomId, joinRoom, leaveRoom])
 
   if (isLoading) {
     return (
@@ -58,61 +58,55 @@ export function ChatContainer({ salaId, usuario }: ChatContainerProps) {
     )
   }
 
-  if (error || !data?.sala) {
+  if (error || !data?.room) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background">
-        <p className="text-destructive">Sala não encontrada ou acesso negado</p>
+        <p className="text-destructive">Room not found or access denied</p>
         <Link
-          href="/salas"
+          href="/rooms"
           className="flex items-center gap-2 text-primary hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
-          Voltar para salas
+          Back to rooms
         </Link>
       </div>
     )
   }
 
-  const sala = data.sala
+  const room = data.room
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Área principal do chat */}
-      <div className="flex flex-1 flex-col">
-        {/* Cabeçalho */}
-        <header className="flex items-center gap-4 border-b border-border bg-card px-4 py-3">
+      <div className="flex flex-1 flex-col min-w-0">
+        <header className="flex items-center gap-3 border-b border-border px-4 py-3 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
           <Link
-            href="/salas"
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            href="/rooms"
+            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-muted-foreground" />
           </Link>
-          <div>
-            <h1 className="font-semibold text-foreground">{sala.nome}</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-semibold text-foreground truncate">{room.name}</h1>
             <p className="text-xs text-muted-foreground">
-              {sala.participantes.length} participante{sala.participantes.length !== 1 ? 's' : ''} •{' '}
-              {sala.assistentes.length} assistente{sala.assistentes.length !== 1 ? 's' : ''}
+              {room.participants.length} participant{room.participants.length !== 1 ? 's' : ''} ·{' '}
+              {room.assistants.length} assistant{room.assistants.length !== 1 ? 's' : ''}
             </p>
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <span
-              className={`h-2 w-2 rounded-full ${conectado ? 'bg-green-500' : 'bg-yellow-500'}`}
+              className={`h-2 w-2 rounded-full ${connected ? 'bg-primary' : 'bg-yellow-500'}`}
             />
-            <span className="text-xs text-muted-foreground">
-              {conectado ? 'Conectado' : 'Conectando...'}
+            <span className="text-xs text-muted-foreground hidden sm:inline">
+              {connected ? 'Connected' : 'Connecting...'}
             </span>
           </div>
         </header>
 
-        {/* Lista de mensagens */}
-        <ListaMensagens salaId={salaId} usuarioId={usuario.id} />
-
-        {/* Input de mensagem */}
-        <InputMensagem salaId={salaId} />
+        <MessageList roomId={roomId} userId={user.id} />
+        <MessageInput roomId={roomId} />
       </div>
 
-      {/* Painel lateral */}
-      <PainelLateral sala={sala} />
+      <SidePanel room={room} />
     </div>
   )
 }

@@ -2,10 +2,10 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 export default async function Home() {
-  const sessao = await auth()
+  const session = await auth()
 
-  if (sessao?.user) {
-    redirect('/salas')
+  if (session?.user) {
+    redirect('/rooms')
   } else {
     redirect('/login')
   }

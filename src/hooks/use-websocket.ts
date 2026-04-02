@@ -2,107 +2,102 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import {
-  conectar,
-  desconectar,
-  entrarSala as wsEntrarSala,
-  sairSala as wsSairSala,
-  enviarMensagem as wsEnviarMensagem,
-  indicarDigitando as wsIndicarDigitando,
-  aoReceberMensagem,
-  aoUsuarioEntrar,
-  aoUsuarioSair,
-  aoUsuarioDigitar,
+  connect,
+  disconnect,
+  joinRoom as wsJoinRoom,
+  leaveRoom as wsLeaveRoom,
+  sendMessage as wsSendMessage,
+  setTyping as wsSetTyping,
+  onMessage,
+  onTyping,
 } from '@/services/websocket'
-import type { Mensagem, EventoDigitando, SalaId, UsuarioId } from '@/types'
+import type { Message, TypingEvent, RoomId, UserId } from '@/types'
 
 interface UseWebSocketReturn {
-  conectado: boolean
-  mensagens: Mensagem[]
-  usuariosDigitando: Map<string, boolean>
-  entrarSala: (salaId: SalaId) => void
-  sairSala: (salaId: SalaId) => void
-  enviarMensagem: (mensagem: Mensagem) => void
-  indicarDigitando: (salaId: SalaId, estaDigitando: boolean) => void
+  connected: boolean
+  messages: Message[]
+  usersTyping: Map<string, boolean>
+  joinRoom: (roomId: RoomId) => void
+  leaveRoom: (roomId: RoomId) => void
+  sendMessage: (message: Message) => void
+  setTyping: (roomId: RoomId, isTyping: boolean) => void
 }
 
-export function useWebSocket(usuarioId: UsuarioId): UseWebSocketReturn {
-  const [conectado, setConectado] = useState(false)
-  const [mensagens, setMensagens] = useState<Mensagem[]>([])
-  const [usuariosDigitando, setUsuariosDigitando] = useState<Map<string, boolean>>(new Map())
-  const inicializado = useRef(false)
+export function useWebSocket(userId: UserId): UseWebSocketReturn {
+  const [connected, setConnected] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [usersTyping, setUsersTyping] = useState<Map<string, boolean>>(new Map())
+  const initialized = useRef(false)
 
-  // Conectar ao montar
   useEffect(() => {
-    if (inicializado.current) return
-    inicializado.current = true
+    if (initialized.current) return
+    initialized.current = true
 
-    const socket = conectar(usuarioId)
+    const socket = connect(userId)
 
     socket.on('connect', () => {
-      setConectado(true)
+      setConnected(true)
     })
 
     socket.on('disconnect', () => {
-      setConectado(false)
+      setConnected(false)
     })
 
-    // Listener de novas mensagens
-    const cancelarMensagem = aoReceberMensagem((evento) => {
-      setMensagens((atual) => [...atual, evento.mensagem])
+    const cancelMessage = onMessage((event) => {
+      setMessages((current) => [...current, event.message])
     })
 
-    // Listener de digitação
-    const cancelarDigitando = aoUsuarioDigitar((evento: EventoDigitando) => {
-      setUsuariosDigitando((atual) => {
-        const novo = new Map(atual)
-        if (evento.estaDigitando) {
-          novo.set(evento.remetenteId, true)
+    const cancelTyping = onTyping((event: TypingEvent) => {
+      setUsersTyping((current) => {
+        const next = new Map(current)
+        if (event.isTyping) {
+          next.set(event.senderId, true)
         } else {
-          novo.delete(evento.remetenteId)
+          next.delete(event.senderId)
         }
-        return novo
+        return next
       })
     })
 
     return () => {
-      cancelarMensagem()
-      cancelarDigitando()
-      desconectar()
+      cancelMessage()
+      cancelTyping()
+      disconnect()
     }
-  }, [usuarioId])
+  }, [userId])
 
-  const entrarSala = useCallback(
-    (salaId: SalaId) => {
-      wsEntrarSala(salaId, usuarioId)
+  const joinRoom = useCallback(
+    (roomId: RoomId) => {
+      wsJoinRoom(roomId, userId)
     },
-    [usuarioId]
+    [userId]
   )
 
-  const sairSala = useCallback(
-    (salaId: SalaId) => {
-      wsSairSala(salaId, usuarioId)
+  const leaveRoom = useCallback(
+    (roomId: RoomId) => {
+      wsLeaveRoom(roomId, userId)
     },
-    [usuarioId]
+    [userId]
   )
 
-  const enviarMensagem = useCallback((mensagem: Mensagem) => {
-    wsEnviarMensagem(mensagem)
+  const sendMessage = useCallback((message: Message) => {
+    wsSendMessage(message)
   }, [])
 
-  const indicarDigitando = useCallback(
-    (salaId: SalaId, estaDigitando: boolean) => {
-      wsIndicarDigitando(salaId, usuarioId, estaDigitando)
+  const setTyping = useCallback(
+    (roomId: RoomId, isTyping: boolean) => {
+      wsSetTyping(roomId, userId, isTyping)
     },
-    [usuarioId]
+    [userId]
   )
 
   return {
-    conectado,
-    mensagens,
-    usuariosDigitando,
-    entrarSala,
-    sairSala,
-    enviarMensagem,
-    indicarDigitando,
+    connected,
+    messages,
+    usersTyping,
+    joinRoom,
+    leaveRoom,
+    sendMessage,
+    setTyping,
   }
 }

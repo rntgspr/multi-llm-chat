@@ -6,8 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Gera um ID único
+ * Generates a unique ID
  */
-export function gerarId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`
+export function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
 }
