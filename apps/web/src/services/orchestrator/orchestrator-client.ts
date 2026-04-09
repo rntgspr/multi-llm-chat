@@ -1,4 +1,4 @@
-import { listAssistants } from '@/services/assistants/assistant-manager'
+import { listAssistants } from '@multi-llm/interpretation'
 
 import type { AssistantId } from '@/types'
 
@@ -70,7 +70,7 @@ export async function decideRouting(
   availableAssistants: AssistantId[],
   recentMessages: OrchestratorMessage[]
 ): Promise<RoutingDecision> {
-  const assistants = listAssistants()
+  const assistants = await listAssistants()
   const assistantDescriptions = availableAssistants
     .map((id) => {
       const a = assistants.find((x) => x.id === id)

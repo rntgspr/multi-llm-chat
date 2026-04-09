@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Bot, Loader2, Sparkles, User } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
+import { MarkdownRenderer } from '@/components/ui/markdown-renderer'
 import { useWebSocket } from '@/hooks/use-websocket'
 
 import type { Message } from '@multi-llm/types'
@@ -133,9 +134,7 @@ function MessageItem({ message, isCurrentUser }: MessageItemProps) {
           {message.content.map((content, index) => (
             <div key={index}>
               {content.type === 'text' && (
-                <p className="whitespace-pre-wrap wrap-break-word text-sm text-foreground leading-relaxed">
-                  {content.text}
-                </p>
+                <MarkdownRenderer content={content.text} className="text-sm text-foreground" />
               )}
               {content.type === 'image' && (
                 <img src={content.url} alt={content.altText || 'Image'} className="rounded-xl max-w-md mt-2" />

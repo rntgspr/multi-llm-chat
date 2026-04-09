@@ -1,14 +1,6 @@
-import type { AssistantId, Invite, InviteId, Room, RoomId, UserId } from '@multi-llm/types'
+import { inviteRepository, roomRepository } from '@multi-llm/db/repositories'
 
-const rooms = new Map<RoomId, Room>()
-const invites = new Map<string, Invite>() // code -> Invite
-
-/**
- * Generates a unique ID
- */
-function generateId(): string {
-  return `${Date.now()}_${Math.random().toString(36).slice(2)}`
-}
+import type { AssistantId, Invite, Room, RoomId, UserId } from '@multi-llm/types'
 
 /**
  * Generates a random invite code
@@ -29,93 +21,130 @@ function generateInviteCode(): string {
 /**
  * Creates a new room
  */
-export function createRoom(name: string, creatorId: UserId, assistantIds: AssistantId[] = []): Room {
-  const room: Room = {
-    id: generateId(),
-    name,
-    createdBy: creatorId,
-    createdAt: new Date(),
-    participants: [creatorId],
-    assistants: assistantIds,
+export async function createRoom(name: string, creatorId: UserId, assistantIds: AssistantId[] = []): Promise<Room> {
+  try {
+    return await roomRepository.create({
+      name,
+      createdBy: creatorId,
+      participants: [creatorId],
+      assistants: assistantIds,
+    })
+  } catch (error) {
+    console.error('[RoomManager] Failed to create room:', error)
+    throw new Error('Failed to create room')
   }
-  rooms.set(room.id, room)
-  return room
 }
 
 /**
  * Gets a room by ID
  */
-export function getRoom(roomId: RoomId): Room | undefined {
-  return rooms.get(roomId)
+export async function getRoom(roomId: RoomId): Promise<Room | undefined> {
+  try {
+    const room = await roomRepository.findById(roomId)
+    return room ?? undefined
+  } catch (error) {
+    console.error('[RoomManager] Failed to get room:', error)
+    return undefined
+  }
 }
 
 /**
  * Lists all rooms for a user
  */
-export function listUserRooms(userId: UserId): Room[] {
-  return Array.from(rooms.values()).filter((room) => room.participants.includes(userId))
+export async function listUserRooms(userId: UserId): Promise<Room[]> {
+  try {
+    return await roomRepository.findByMember(userId)
+  } catch (error) {
+    console.error('[RoomManager] Failed to list user rooms:', error)
+    return []
+  }
 }
 
 /**
  * Adds a participant to a room
  */
-export function addParticipant(roomId: RoomId, userId: UserId): boolean {
-  const room = rooms.get(roomId)
-  if (!room) return false
-
-  if (!room.participants.includes(userId)) {
-    room.participants.push(userId)
+export async function addParticipant(roomId: RoomId, userId: UserId): Promise<boolean> {
+  try {
+    await roomRepository.addMember(roomId, userId)
+    return true
+  } catch (error) {
+    console.error('[RoomManager] Failed to add participant:', error)
+    return false
   }
-  return true
 }
 
 /**
  * Removes a participant from a room
  */
-export function removeParticipant(roomId: RoomId, userId: UserId): boolean {
-  const room = rooms.get(roomId)
-  if (!room) return false
-
-  room.participants = room.participants.filter((id) => id !== userId)
-  return true
+export async function removeParticipant(roomId: RoomId, userId: UserId): Promise<boolean> {
+  try {
+    await roomRepository.removeMember(roomId, userId)
+    return true
+  } catch (error) {
+    console.error('[RoomManager] Failed to remove participant:', error)
+    return false
+  }
 }
 
 /**
  * Adds an assistant to a room
  */
-export function addAssistant(roomId: RoomId, assistantId: AssistantId): boolean {
-  const room = rooms.get(roomId)
-  if (!room) return false
+export async function addAssistant(roomId: RoomId, assistantId: AssistantId): Promise<boolean> {
+  try {
+    const room = await roomRepository.findById(roomId)
+    if (!room) return false
 
-  if (!room.assistants.includes(assistantId)) {
-    room.assistants.push(assistantId)
+    if (!room.assistants.includes(assistantId)) {
+      const updatedAssistants = [...room.assistants, assistantId]
+      await roomRepository.update(roomId, { assistants: updatedAssistants })
+    }
+    return true
+  } catch (error) {
+    console.error('[RoomManager] Failed to add assistant:', error)
+    return false
   }
-  return true
 }
 
 /**
  * Removes an assistant from a room
  */
-export function removeAssistant(roomId: RoomId, assistantId: AssistantId): boolean {
-  const room = rooms.get(roomId)
-  if (!room) return false
+export async function removeAssistant(roomId: RoomId, assistantId: AssistantId): Promise<boolean> {
+  try {
+    const room = await roomRepository.findById(roomId)
+    if (!room) return false
 
-  room.assistants = room.assistants.filter((id) => id !== assistantId)
-  return true
+    const updatedAssistants = room.assistants.filter((id) => id !== assistantId)
+    await roomRepository.update(roomId, { assistants: updatedAssistants })
+    return true
+  } catch (error) {
+    console.error('[RoomManager] Failed to remove assistant:', error)
+    return false
+  }
 }
 
 /**
  * Deletes a room
  */
-export function deleteRoom(roomId: RoomId): boolean {
-  return rooms.delete(roomId)
+export async function deleteRoom(roomId: RoomId): Promise<boolean> {
+  try {
+    await roomRepository.delete(roomId)
+    return true
+  } catch (error) {
+    console.error('[RoomManager] Failed to delete room:', error)
+    return false
+  }
 }
 
 /**
  * Lists all rooms
  */
-export function listAllRooms(): Room[] {
-  return Array.from(rooms.values())
+export async function listAllRooms(): Promise<Room[]> {
+  try {
+    return await roomRepository.findAll()
+  } catch (error) {
+    console.error('[RoomManager] Failed to list all rooms:', error)
+    return []
+  }
 }
 
 // =============================================================================
@@ -125,88 +154,91 @@ export function listAllRooms(): Room[] {
 /**
  * Creates an invite for a room
  */
-export function createInvite(
+export async function createInvite(
   roomId: RoomId,
   creatorId: UserId,
   expiresInHours?: number,
   maxUses?: number
-): Invite | null {
-  const room = rooms.get(roomId)
-  if (!room) return null
+): Promise<Invite | null> {
+  try {
+    const room = await roomRepository.findById(roomId)
+    if (!room) return null
 
-  if (!room.participants.includes(creatorId)) {
+    if (!room.participants.includes(creatorId)) {
+      return null
+    }
+
+    const code = generateInviteCode()
+    const expiresAt = expiresInHours ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000) : undefined
+
+    return await inviteRepository.create({
+      roomId,
+      code,
+      createdBy: creatorId,
+      expiresAt,
+      maxUses,
+      usedBy: undefined,
+    })
+  } catch (error) {
+    console.error('[RoomManager] Failed to create invite:', error)
     return null
   }
-
-  const code = generateInviteCode()
-  const invite: Invite = {
-    id: generateId() as InviteId,
-    roomId,
-    code,
-    createdBy: creatorId,
-    createdAt: new Date(),
-    expiresAt: expiresInHours ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000) : undefined,
-    usesRemaining: maxUses,
-  }
-
-  invites.set(code, invite)
-  room.activeInvite = invite
-
-  return invite
 }
 
 /**
  * Gets an invite by code
  */
-export function getInvite(code: string): Invite | undefined {
-  return invites.get(code.toUpperCase())
+export async function getInvite(code: string): Promise<Invite | undefined> {
+  try {
+    const invite = await inviteRepository.findByCode(code.toUpperCase())
+    return invite ?? undefined
+  } catch (error) {
+    console.error('[RoomManager] Failed to get invite:', error)
+    return undefined
+  }
 }
 
 /**
  * Uses an invite to join a room
  */
-export function useInvite(code: string, userId: UserId): Room | null {
-  const invite = invites.get(code.toUpperCase())
-  if (!invite) return null
+export async function useInvite(code: string, userId: UserId): Promise<Room | null> {
+  try {
+    const invite = await inviteRepository.findByCode(code.toUpperCase())
+    if (!invite) return null
 
-  if (invite.expiresAt && new Date() > invite.expiresAt) {
-    invites.delete(code.toUpperCase())
-    return null
-  }
-
-  if (invite.usesRemaining !== undefined && invite.usesRemaining <= 0) {
-    invites.delete(code.toUpperCase())
-    return null
-  }
-
-  const success = addParticipant(invite.roomId, userId)
-  if (!success) return null
-
-  if (invite.usesRemaining !== undefined) {
-    invite.usesRemaining--
-    if (invite.usesRemaining <= 0) {
-      invites.delete(code.toUpperCase())
+    if (invite.expiresAt && new Date() > invite.expiresAt) {
+      await inviteRepository.delete(invite.id)
+      return null
     }
-  }
 
-  return rooms.get(invite.roomId) || null
+    if (invite.maxUses !== undefined && invite.usedBy !== undefined) {
+      return null
+    }
+
+    const success = await addParticipant(invite.roomId, userId)
+    if (!success) return null
+
+    await inviteRepository.markAsUsed(invite.id, userId)
+
+    return await roomRepository.findById(invite.roomId)
+  } catch (error) {
+    console.error('[RoomManager] Failed to use invite:', error)
+    return null
+  }
 }
 
 /**
  * Invalidates an invite
  */
-export function invalidateInvite(code: string): boolean {
-  return invites.delete(code.toUpperCase())
-}
+export async function invalidateInvite(code: string): Promise<boolean> {
+  try {
+    const invite = await inviteRepository.findByCode(code.toUpperCase())
+    if (!invite) return false
 
-// =============================================================================
-// CLEANUP
-// =============================================================================
-
-/**
- * Clears all rooms and invites (for testing)
- */
-export function clearAll(): void {
-  rooms.clear()
-  invites.clear()
+    await inviteRepository.delete(invite.id)
+    return true
+  } catch (error) {
+    console.error('[RoomManager] Failed to invalidate invite:', error)
+    return false
+  }
 }

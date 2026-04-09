@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { roomId, expiresInHours, maxUses } = createInviteSchema.parse(body)
 
-    const room = getRoom(roomId)
+    const room = await getRoom(roomId)
     if (!room) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 })
     }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    const invite = createInvite(roomId, session.user.id, expiresInHours, maxUses)
+    const invite = await createInvite(roomId, session.user.id, expiresInHours, maxUses)
 
     if (!invite) {
       return NextResponse.json({ error: 'Failed to create invite' }, { status: 400 })

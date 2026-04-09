@@ -1,69 +1,71 @@
-# Multi-LLM Chat - Ollama Services
+# Multi-LLM Chat - Infrastructure Services
 #
 # Usage:
-#   docker compose up -d                    # Start all
+#   docker compose up -d                    # Start infra (DB + Redis)
 #   docker compose logs -f                  # View logs
 #   docker compose down                     # Stop all
 #
-# Pull models after starting:
-#   docker exec ollama-orchestrator ollama pull llama3.2
-#   docker exec ollama-general ollama pull llama3.2
-#   docker exec ollama-code ollama pull codellama:7b
-#   docker exec ollama-creative ollama pull llama3.2
-
-x-ollama: &ollama-base
-  image: ollama/ollama
-  environment:
-    - OLLAMA_HOST=0.0.0.0
-  healthcheck:
-    test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
-    interval: 30s
-    timeout: 10s
-    retries: 3
-    start_period: 10s
-  restart: unless-stopped
+# For LLM services, use docker-compose.llm.yml:
+#   docker compose -f docker-compose.llm.yml up -d
 
 services:
   # ==========================================================================
-  # ORCHESTRATOR - LLM that decides which assistant should respond
+  # DATABASE - SurrealDB for chat persistence
   # ==========================================================================
-  ollama-orchestrator:
-    <<: *ollama-base
-    container_name: ollama-orchestrator
+  surrealdb:
+    image: surrealdb/surrealdb:v2
+    container_name: multi-llm-surrealdb
+    user: "0:0"
     ports:
-      - "11430:11434"
+      - "8000:8000"
+    command:
+      - start
+      - --log=info
+      - --user=root
+      - --pass=root
+      - rocksdb:/data/surrealdb.db
+    environment:
+      - SURREAL_NAMESPACE=multi_llm_chat
+      - SURREAL_DATABASE=chat
     volumes:
-      - ollama-orchestrator:/root/.ollama
+      - surrealdb_data:/data
+    networks:
+      - multi-llm-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
   # ==========================================================================
-  # ASSISTANTS
+  # CACHE / PUB-SUB - Redis
   # ==========================================================================
-  ollama-general:
-    <<: *ollama-base
-    container_name: ollama-general
+  redis:
+    image: redis:7-alpine
+    container_name: multi-llm-redis
     ports:
-      - "11434:11434"
+      - "6379:6379"
     volumes:
-      - ollama-general:/root/.ollama
-
-  ollama-code:
-    <<: *ollama-base
-    container_name: ollama-code
-    ports:
-      - "11435:11434"
-    volumes:
-      - ollama-code:/root/.ollama
-
-  ollama-creative:
-    <<: *ollama-base
-    container_name: ollama-creative
-    ports:
-      - "11436:11434"
-    volumes:
-      - ollama-creative:/root/.ollama
+      - redis_data:/data
+    networks:
+      - multi-llm-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
 
 volumes:
-  ollama-orchestrator:
-  ollama-general:
-  ollama-code:
-  ollama-creative:
+  surrealdb_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  multi-llm-network:
+    name: multi-llm-network
+    driver: bridge

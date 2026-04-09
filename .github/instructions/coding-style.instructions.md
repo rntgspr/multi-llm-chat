@@ -7,7 +7,7 @@ applyTo: "**/*.{ts,tsx}"
 ## Idioma
 
 - **Inglês**: comentários JSDoc, identificadores de código (variáveis, funções, tipos, nomes de arquivo) e textos de UI.
-- **Português**: todo conteúdo em markdown dentro de `.github/` (instruções, prompts, agentes, skills) e a conversa com o assistente.
+- **Português**: todo conteúdo em markdown dentro de `.github/` e `.specify/` (instruções, prompts, agentes, specs, plans, constitution) e a conversa com o assistente.
 
 ## Princípios Gerais
 

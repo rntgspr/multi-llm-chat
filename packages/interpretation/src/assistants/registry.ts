@@ -1,9 +1,15 @@
+import { assistantRepository } from '@multi-llm/db/repositories'
+
 import type { Assistant, AssistantId, AssistantStatus } from '@multi-llm/types'
 
-const assistants = new Map<AssistantId, Assistant>()
-
-interface AssistantConfig extends Assistant {
+interface AssistantConfig {
+  id: string
+  name: string
+  description: string
+  avatarUrl?: string
+  endpoint: string
   model: string
+  status: AssistantStatus
 }
 
 /**
@@ -43,66 +49,117 @@ const defaultAssistants: AssistantConfig[] = [
 export const modelsByAssistant = new Map<AssistantId, string>()
 
 // Initialize with defaults
-defaultAssistants.forEach((config) => {
-  const { model, ...assistant } = config
-  assistants.set(assistant.id, assistant)
-  modelsByAssistant.set(assistant.id, model)
-})
+async function initializeAssistants() {
+  try {
+    for (const config of defaultAssistants) {
+      const { model, ...assistantData } = config
+      modelsByAssistant.set(config.id, model)
+
+      const existing = await assistantRepository.findById(config.id)
+      if (!existing) {
+        await assistantRepository.create(assistantData)
+      }
+    }
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to initialize assistants:', error)
+  }
+}
+
+// Initialize on module load
+initializeAssistants().catch(console.error)
 
 /**
  * Lists all registered assistants
  */
-export function listAssistants(): Assistant[] {
-  return Array.from(assistants.values())
+export async function listAssistants(): Promise<Assistant[]> {
+  try {
+    return await assistantRepository.findAll()
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to list assistants:', error)
+    return []
+  }
 }
 
 /**
  * Lists only online assistants
  */
-export function listOnlineAssistants(): Assistant[] {
-  return Array.from(assistants.values()).filter((a) => a.status === 'online')
+export async function listOnlineAssistants(): Promise<Assistant[]> {
+  try {
+    const all = await assistantRepository.findAll()
+    return all.filter((a) => a.status === 'online')
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to list online assistants:', error)
+    return []
+  }
 }
 
 /**
  * Gets an assistant by ID
  */
-export function getAssistant(assistantId: AssistantId): Assistant | undefined {
-  return assistants.get(assistantId)
+export async function getAssistant(assistantId: AssistantId): Promise<Assistant | undefined> {
+  try {
+    const assistant = await assistantRepository.findById(assistantId)
+    return assistant ?? undefined
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to get assistant:', error)
+    return undefined
+  }
 }
 
 /**
  * Updates assistant status
  */
-export function updateAssistantStatus(assistantId: AssistantId, status: AssistantStatus): boolean {
-  const assistant = assistants.get(assistantId)
-  if (!assistant) return false
-
-  assistant.status = status
-  return true
+export async function updateAssistantStatus(assistantId: AssistantId, status: AssistantStatus): Promise<boolean> {
+  try {
+    await assistantRepository.update(assistantId, { status })
+    return true
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to update status:', error)
+    return false
+  }
 }
 
 /**
  * Registers a new assistant
  */
-export function registerAssistant(assistant: Assistant, model?: string): void {
-  assistants.set(assistant.id, assistant)
-  if (model) {
-    modelsByAssistant.set(assistant.id, model)
+export async function registerAssistant(
+  assistant: Omit<Assistant, 'id'> & { id: string },
+  model?: string
+): Promise<void> {
+  try {
+    await assistantRepository.create(assistant)
+    if (model) {
+      modelsByAssistant.set(assistant.id, model)
+    }
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to register assistant:', error)
+    throw error
   }
 }
 
 /**
  * Removes an assistant
  */
-export function removeAssistant(assistantId: AssistantId): boolean {
-  modelsByAssistant.delete(assistantId)
-  return assistants.delete(assistantId)
+export async function removeAssistant(assistantId: AssistantId): Promise<boolean> {
+  try {
+    modelsByAssistant.delete(assistantId)
+    await assistantRepository.delete(assistantId)
+    return true
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to remove assistant:', error)
+    return false
+  }
 }
 
 /**
  * Checks if an assistant is available
  */
-export function isAssistantAvailable(assistantId: AssistantId): boolean {
-  const assistant = assistants.get(assistantId)
-  return assistant?.status === 'online'
+export async function isAssistantAvailable(assistantId: AssistantId): Promise<boolean> {
+  try {
+    const assistant = await assistantRepository.findById(assistantId)
+    return assistant?.status === 'online'
+  } catch (error) {
+    console.error('[AssistantRegistry] Failed to check availability:', error)
+    return false
+  }
 }

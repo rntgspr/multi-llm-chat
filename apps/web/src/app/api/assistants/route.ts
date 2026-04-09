@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const onlineOnly = searchParams.get('online') === 'true'
 
-  const assistants = onlineOnly ? listOnlineAssistants() : listAssistants()
+  const assistants = onlineOnly ? await listOnlineAssistants() : await listAssistants()
 
   return NextResponse.json({ assistants })
 }

@@ -7,4 +7,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Language
 
 - Code, comments, variables, file names, and all source files **MUST** be in English.
-- Only content inside `.github/` directory (documentation, memory, instructions) should be in Brazilian Portuguese (pt-BR).
+- Only content inside `.github/` and `.specify/` directories (documentation, memory, instructions, constitution, specs, plans) should be in Brazilian Portuguese (pt-BR).

@@ -12,7 +12,7 @@ interface RouteParams {
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   const { code } = await params
-  const invite = getInvite(code)
+  const invite = await getInvite(code)
 
   if (!invite) {
     return NextResponse.json({ error: 'Invite not found or expired' }, { status: 404 })
@@ -45,7 +45,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const room = useInvite(code, session.user.id)
+  const room = await useInvite(code, session.user.id)
 
   if (!room) {
     return NextResponse.json({ error: 'Invalid, expired, or exhausted invite' }, { status: 400 })

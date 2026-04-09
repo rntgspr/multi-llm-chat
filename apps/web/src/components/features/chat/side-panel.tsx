@@ -1,10 +1,39 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Bot, Check, Copy, Link2, Loader2, Users } from 'lucide-react'
 import { useState } from 'react'
 
-import type { Invite, Room } from '@multi-llm/types'
+import type { AssistantId, AssistantStatus, Invite, Room } from '@multi-llm/types'
+
+interface AssistantHealth {
+  id: AssistantId
+  status: AssistantStatus
+  hasModel: boolean
+}
+
+interface HealthResponse {
+  health: Record<AssistantId, AssistantHealth>
+}
+
+async function fetchAssistantHealth(): Promise<HealthResponse> {
+  const response = await fetch('/api/assistants/health')
+  if (!response.ok) {
+    throw new Error('Failed to fetch assistant health')
+  }
+  return response.json()
+}
+
+function getStatusColor(status?: AssistantStatus): string {
+  switch (status) {
+    case 'online':
+      return 'text-green-500'
+    case 'busy':
+      return 'text-yellow-500'
+    default:
+      return 'text-red-500'
+  }
+}
 
 interface SidePanelProps {
   room: Room
@@ -25,6 +54,13 @@ async function generateInvite(roomId: string): Promise<{ invite: Invite; inviteU
 export function SidePanel({ room }: SidePanelProps) {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+
+  const { data: healthData } = useQuery({
+    queryKey: ['assistant-health'],
+    queryFn: fetchAssistantHealth,
+    refetchInterval: 30000, // Check every 30 seconds
+    staleTime: 15000,
+  })
 
   const inviteMutation = useMutation({
     mutationFn: () => generateInvite(room.id),
@@ -75,12 +111,17 @@ export function SidePanel({ room }: SidePanelProps) {
           Assistants ({room.assistants.length})
         </h3>
         <ul className="space-y-2">
-          {room.assistants.map((assistantId) => (
-            <li key={assistantId} className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Bot className="h-4 w-4 text-primary" />
-              <span className="truncate">{assistantId}</span>
-            </li>
-          ))}
+          {room.assistants.map((assistantId) => {
+            const health = healthData?.health[assistantId]
+            const statusColor = getStatusColor(health?.status)
+
+            return (
+              <li key={assistantId} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Bot className={`h-4 w-4 ${statusColor}`} />
+                <span className="truncate">{assistantId}</span>
+              </li>
+            )
+          })}
         </ul>
       </div>
 

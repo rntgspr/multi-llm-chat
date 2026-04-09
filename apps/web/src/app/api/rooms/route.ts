@@ -19,7 +19,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const rooms = listUserRooms(session.user.id)
+  const rooms = await listUserRooms(session.user.id)
   return NextResponse.json({ rooms })
 }
 
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = createRoomSchema.parse(body)
 
-    const room = createRoom(data.name, session.user.id, data.assistants)
+    const room = await createRoom(data.name, session.user.id, data.assistants)
 
     return NextResponse.json({ room }, { status: 201 })
   } catch (error) {

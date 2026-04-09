@@ -1,3 +1,5 @@
+import { messageRepository } from '@multi-llm/db/repositories'
+
 import type {
   AssistantId,
   Message,
@@ -8,13 +10,6 @@ import type {
   SenderType,
   UserId,
 } from '@multi-llm/types'
-
-/**
- * Generates a unique ID
- */
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
-}
 
 interface CreateMessageParams {
   roomId: RoomId
@@ -27,100 +22,166 @@ interface CreateMessageParams {
 
 interface GetMessagesOptions {
   limit?: number
+  page?: number
   since?: Date
   publicOnly?: boolean
 }
 
 /**
- * In-memory message storage.
- * TODO: Replace with database integration via @multi-llm/db
+ * Message storage with SurrealDB persistence
  */
 export class MessageStore {
-  private messagesByRoom = new Map<RoomId, Message[]>()
-
   /**
    * Creates a new message
    */
-  create(params: CreateMessageParams): Message {
-    const message: Message = {
-      id: generateId() as MessageId,
-      roomId: params.roomId,
-      senderId: params.senderId,
-      senderType: params.senderType,
-      content: params.content,
-      visibility: params.visibility ?? 'public',
-      recipientId: params.recipientId,
-      createdAt: new Date(),
-    }
+  async create(params: CreateMessageParams): Promise<Message> {
+    try {
+      const contentString = JSON.stringify(params.content)
 
-    if (!this.messagesByRoom.has(params.roomId)) {
-      this.messagesByRoom.set(params.roomId, [])
-    }
+      const dbMessage = await messageRepository.create({
+        roomId: params.roomId,
+        userId: params.senderId,
+        content: contentString,
+        isHidden: params.visibility === 'hidden',
+        metadata: {
+          senderType: params.senderType,
+          recipientId: params.recipientId,
+        },
+      })
 
-    this.messagesByRoom.get(params.roomId)!.push(message)
-    return message
+      return {
+        id: dbMessage.id as MessageId,
+        roomId: dbMessage.roomId as RoomId,
+        senderId: params.senderId,
+        senderType: params.senderType,
+        content: params.content,
+        visibility: params.visibility ?? 'public',
+        recipientId: params.recipientId,
+        createdAt: dbMessage.timestamp,
+      }
+    } catch (error) {
+      console.error('[MessageStore] Failed to create message:', error)
+      throw error
+    }
   }
 
   /**
    * Gets messages from a room
    */
-  getByRoom(roomId: RoomId, options?: GetMessagesOptions): Message[] {
-    let messages = this.messagesByRoom.get(roomId) || []
+  async getByRoom(roomId: RoomId, options?: GetMessagesOptions): Promise<Message[]> {
+    try {
+      const page = options?.page ?? 1
+      const limit = options?.limit ?? 50
+      const offset = (page - 1) * limit
 
-    if (options?.publicOnly) {
-      messages = messages.filter((m) => m.visibility === 'public')
+      const dbMessages = await messageRepository.findByRoom(roomId, limit, offset)
+
+      const messages: Message[] = dbMessages.map((dbMsg) => {
+        const metadata = (dbMsg.metadata || {}) as {
+          senderType?: SenderType
+          recipientId?: AssistantId
+        }
+
+        let content: MessageContent[]
+        try {
+          content = JSON.parse(dbMsg.content)
+        } catch {
+          content = [{ type: 'text', text: dbMsg.content }]
+        }
+
+        return {
+          id: dbMsg.id as MessageId,
+          roomId: dbMsg.roomId as RoomId,
+          senderId: dbMsg.userId,
+          senderType: metadata.senderType || 'user',
+          content,
+          visibility: dbMsg.isHidden ? 'hidden' : 'public',
+          recipientId: metadata.recipientId,
+          createdAt: dbMsg.timestamp,
+        }
+      })
+
+      let filtered = messages
+
+      if (options?.publicOnly) {
+        filtered = filtered.filter((m) => m.visibility === 'public')
+      }
+
+      if (options?.since) {
+        filtered = filtered.filter((m) => m.createdAt >= options.since!)
+      }
+
+      return filtered
+    } catch (error) {
+      console.error('[MessageStore] Failed to get messages:', error)
+      return []
     }
-
-    if (options?.since) {
-      messages = messages.filter((m) => m.createdAt >= options.since!)
-    }
-
-    if (options?.limit && messages.length > options.limit) {
-      messages = messages.slice(-options.limit)
-    }
-
-    return messages
   }
 
   /**
    * Gets a specific message by ID
    */
-  getById(roomId: RoomId, messageId: MessageId): Message | undefined {
-    const messages = this.messagesByRoom.get(roomId) || []
-    return messages.find((m) => m.id === messageId)
+  async getById(roomId: RoomId, messageId: MessageId): Promise<Message | undefined> {
+    try {
+      const dbMessage = await messageRepository.findById(messageId)
+      if (!dbMessage || dbMessage.roomId !== roomId) return undefined
+
+      const metadata = (dbMessage.metadata || {}) as {
+        senderType?: SenderType
+        recipientId?: AssistantId
+      }
+
+      let content: MessageContent[]
+      try {
+        content = JSON.parse(dbMessage.content)
+      } catch {
+        content = [{ type: 'text', text: dbMessage.content }]
+      }
+
+      return {
+        id: dbMessage.id as MessageId,
+        roomId: dbMessage.roomId as RoomId,
+        senderId: dbMessage.userId,
+        senderType: metadata.senderType || 'user',
+        content,
+        visibility: dbMessage.isHidden ? 'hidden' : 'public',
+        recipientId: metadata.recipientId,
+        createdAt: dbMessage.timestamp,
+      }
+    } catch (error) {
+      console.error('[MessageStore] Failed to get message by id:', error)
+      return undefined
+    }
   }
 
   /**
    * Gets hidden messages for a specific assistant
    */
-  getHiddenForAssistant(roomId: RoomId, assistantId: AssistantId): Message[] {
-    const messages = this.messagesByRoom.get(roomId) || []
-    return messages.filter((m) => m.visibility === 'hidden' && (m.recipientId === assistantId || !m.recipientId))
+  async getHiddenForAssistant(roomId: RoomId, assistantId: AssistantId): Promise<Message[]> {
+    try {
+      const allMessages = await this.getByRoom(roomId, { limit: 1000 })
+      return allMessages.filter((m) => m.visibility === 'hidden' && (m.recipientId === assistantId || !m.recipientId))
+    } catch (error) {
+      console.error('[MessageStore] Failed to get hidden messages:', error)
+      return []
+    }
   }
 
   /**
    * Counts messages in a room
    */
-  count(roomId: RoomId, publicOnly = false): number {
-    const messages = this.messagesByRoom.get(roomId) || []
-    if (publicOnly) {
-      return messages.filter((m) => m.visibility === 'public').length
+  async count(roomId: RoomId, publicOnly = false): Promise<number> {
+    try {
+      const total = await messageRepository.countByRoom(roomId)
+      if (!publicOnly) return total
+
+      // For publicOnly, we need to fetch and count
+      const messages = await this.getByRoom(roomId, { limit: 10000, publicOnly: true })
+      return messages.length
+    } catch (error) {
+      console.error('[MessageStore] Failed to count messages:', error)
+      return 0
     }
-    return messages.length
-  }
-
-  /**
-   * Clears messages from a room
-   */
-  clearRoom(roomId: RoomId): void {
-    this.messagesByRoom.delete(roomId)
-  }
-
-  /**
-   * Clears all messages
-   */
-  clearAll(): void {
-    this.messagesByRoom.clear()
   }
 }
 

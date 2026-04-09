@@ -1,0 +1,5 @@
+export { AssistantRepository, assistantRepository } from './assistant.repository'
+export { InviteRepository, inviteRepository } from './invite.repository'
+export { MessageRepository, messageRepository } from './message.repository'
+export { RoomRepository, roomRepository } from './room.repository'
+export { UserRepository, userRepository } from './user.repository'

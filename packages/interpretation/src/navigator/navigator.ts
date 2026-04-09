@@ -50,9 +50,10 @@ export class Navigator {
       }
     }
 
-    // Fallback to default assistant
+    // Fallback to first available assistant in the room
+    const fallback = context.availableAssistants[0] || this.options.fallbackAssistant!
     return {
-      assistants: [this.options.fallbackAssistant!],
+      assistants: [fallback],
       reasoning: 'Fallback to default assistant',
       shouldBlock: true,
     }

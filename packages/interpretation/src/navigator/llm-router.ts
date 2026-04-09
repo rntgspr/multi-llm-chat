@@ -100,9 +100,10 @@ Which assistant should respond? JSON only.`
     // Parse JSON from response
     const jsonMatch = response.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
-      console.log('[Navigator] No JSON found, defaulting to general-assistant')
+      const fallback = context.availableAssistants[0] || 'general-assistant'
+      console.log(`[Navigator] No JSON found, defaulting to ${fallback}`)
       return {
-        assistants: ['general-assistant'],
+        assistants: [fallback],
         reasoning: 'Failed to parse LLM response',
         shouldBlock: true,
       }
@@ -113,8 +114,12 @@ Which assistant should respond? JSON only.`
     // Filter to only available assistants
     const validAssistants = decision.assistants.filter((id) => context.availableAssistants.includes(id))
 
+    // Fallback to first available assistant if none match
     if (validAssistants.length === 0) {
-      validAssistants.push('general-assistant')
+      const firstAvailable = context.availableAssistants[0]
+      if (firstAvailable) {
+        validAssistants.push(firstAvailable)
+      }
     }
 
     console.log(`[Navigator] Decision: ${validAssistants.join(', ')} - ${decision.reasoning}`)
@@ -126,8 +131,10 @@ Which assistant should respond? JSON only.`
     }
   } catch (error) {
     console.error('[Navigator] LLM error:', error)
+    // Fallback to first available assistant
+    const fallback = context.availableAssistants[0] || 'general-assistant'
     return {
-      assistants: ['general-assistant'],
+      assistants: [fallback],
       reasoning: 'LLM routing failed, using fallback',
       shouldBlock: true,
     }

@@ -1,73 +1,115 @@
+import { userRepository } from '@multi-llm/db/repositories'
+
 import type { User, UserId } from '@multi-llm/types'
-
-const users = new Map<UserId, User>()
-
-/**
- * Generates a unique ID
- */
-function generateId(): string {
-  return `user_${Date.now()}_${Math.random().toString(36).slice(2)}`
-}
 
 /**
  * Creates a new user
  */
-export function createUser(name: string, email: string, avatarUrl?: string): User {
-  const user: User = {
-    id: generateId(),
+export async function createUser(name: string, email: string, avatarUrl?: string): Promise<User> {
+  const user = await userRepository.create({
     name,
     email,
-    avatarUrl,
-    createdAt: new Date(),
+    avatar: avatarUrl,
+  })
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatarUrl: user.avatar,
+    createdAt: user.createdAt,
   }
-  users.set(user.id, user)
-  return user
 }
 
 /**
  * Gets a user by ID
  */
-export function getUser(userId: UserId): User | undefined {
-  return users.get(userId)
+export async function getUser(userId: UserId): Promise<User | undefined> {
+  const user = await userRepository.findById(userId)
+  if (!user) return undefined
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatarUrl: user.avatar,
+    createdAt: user.createdAt,
+  }
 }
 
 /**
  * Gets a user by email
  */
-export function getUserByEmail(email: string): User | undefined {
-  return Array.from(users.values()).find((u) => u.email === email)
+export async function getUserByEmail(email: string): Promise<User | undefined> {
+  const user = await userRepository.findByEmail(email)
+  if (!user) return undefined
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatarUrl: user.avatar,
+    createdAt: user.createdAt,
+  }
 }
 
 /**
  * Updates a user
  */
-export function updateUser(userId: UserId, updates: Partial<Omit<User, 'id' | 'createdAt'>>): User | undefined {
-  const user = users.get(userId)
-  if (!user) return undefined
+export async function updateUser(
+  userId: UserId,
+  updates: Partial<Omit<User, 'id' | 'createdAt'>>
+): Promise<User | undefined> {
+  try {
+    const user = await userRepository.update(userId, {
+      name: updates.name,
+      email: updates.email,
+      avatar: updates.avatarUrl,
+    })
 
-  Object.assign(user, updates)
-  return user
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatar,
+      createdAt: user.createdAt,
+    }
+  } catch (_error) {
+    // If user not found, return undefined
+    return undefined
+  }
 }
 
 /**
  * Deletes a user
  */
-export function deleteUser(userId: UserId): boolean {
-  return users.delete(userId)
+export async function deleteUser(userId: UserId): Promise<boolean> {
+  try {
+    await userRepository.delete(userId)
+    return true
+  } catch (_error) {
+    return false
+  }
 }
 
 /**
  * Lists all users
  */
-export function listUsers(): User[] {
-  return Array.from(users.values())
+export async function listUsers(): Promise<User[]> {
+  const users = await userRepository.findAll()
+  return users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatarUrl: user.avatar,
+    createdAt: user.createdAt,
+  }))
 }
 
 /**
  * Gets or creates a user by email
  */
-export function getOrCreateUser(email: string, name: string, avatarUrl?: string): User {
-  const existing = getUserByEmail(email)
+export async function getOrCreateUser(email: string, name: string, avatarUrl?: string): Promise<User> {
+  const existing = await getUserByEmail(email)
   if (existing) return existing
   return createUser(name, email, avatarUrl)
 }

@@ -1,0 +1,101 @@
+#V2
+-- ==========================================
+-- ROOMS TABLE
+-- ==========================================
+DEFINE TABLE room SCHEMAFULL;
+DEFINE FIELD name ON TABLE room TYPE string ASSERT $value != NONE;
+DEFINE FIELD members ON TABLE room TYPE array<string> DEFAULT [];
+DEFINE FIELD createdBy ON TABLE room TYPE string ASSERT $value != NONE;
+DEFINE FIELD createdAt ON TABLE room TYPE datetime DEFAULT time::now();
+DEFINE FIELD updatedAt ON TABLE room TYPE option<datetime>;
+DEFINE INDEX roomCreatedByIndex ON TABLE room FIELDS createdBy;
+-- ==========================================
+-- MESSAGES TABLE
+-- ==========================================
+DEFINE TABLE message SCHEMAFULL;
+DEFINE FIELD roomId ON TABLE message TYPE string ASSERT $value != NONE;
+DEFINE FIELD userId ON TABLE message TYPE string ASSERT $value != NONE;
+DEFINE FIELD content ON TABLE message TYPE string ASSERT $value != NONE;
+DEFINE FIELD isHidden ON TABLE message TYPE bool DEFAULT false;
+DEFINE FIELD timestamp ON TABLE message TYPE datetime DEFAULT time::now();
+DEFINE FIELD metadata ON TABLE message TYPE option<object>;
+DEFINE INDEX messageRoomIndex ON TABLE message FIELDS roomId;
+DEFINE INDEX messageUserIndex ON TABLE message FIELDS userId;
+DEFINE INDEX messageTimestampIndex ON TABLE message FIELDS timestamp;
+-- ==========================================
+-- ASSISTANTS TABLE
+-- ==========================================
+DEFINE TABLE assistant SCHEMAFULL;
+DEFINE FIELD name ON TABLE assistant TYPE string ASSERT $value != NONE;
+DEFINE FIELD model ON TABLE assistant TYPE string ASSERT $value != NONE;
+DEFINE FIELD provider ON TABLE assistant TYPE string ASSERT $value IN ['ollama', 'openai', 'anthropic'];
+DEFINE FIELD config ON TABLE assistant TYPE object DEFAULT {};
+DEFINE FIELD createdAt ON TABLE assistant TYPE datetime DEFAULT time::now();
+DEFINE INDEX assistantNameIndex ON TABLE assistant FIELDS name;
+-- ==========================================
+-- INVITES TABLE
+-- ==========================================
+DEFINE TABLE invite SCHEMAFULL;
+DEFINE FIELD code ON TABLE invite TYPE string ASSERT $value != NONE;
+DEFINE FIELD roomId ON TABLE invite TYPE string ASSERT $value != NONE;
+DEFINE FIELD expiresAt ON TABLE invite TYPE datetime ASSERT $value != NONE;
+DEFINE FIELD usedBy ON TABLE invite TYPE option<string>;
+DEFINE FIELD createdAt ON TABLE invite TYPE datetime DEFAULT time::now();
+DEFINE INDEX inviteCodeIndex ON TABLE invite FIELDS code UNIQUE;
+DEFINE INDEX inviteRoomIndex ON TABLE invite FIELDS roomId;
+-- ==========================================
+-- MULTI-LLM CHAT - DATABASE SCHEMA
+-- ==========================================
+-- USERS TABLE
+-- ==========================================
+DEFINE TABLE user SCHEMAFULL;
+DEFINE FIELD name ON TABLE user TYPE string ASSERT $value != NONE;
+DEFINE FIELD email ON TABLE user TYPE string ASSERT $value != NONE AND string::is::email($value);
+DEFINE FIELD avatar ON TABLE user TYPE option<string>;
+DEFINE FIELD createdAt ON TABLE user TYPE datetime DEFAULT time::now();
+DEFINE FIELD updatedAt ON TABLE user TYPE option<datetime>;
+DEFINE INDEX userEmailIndex ON TABLE user FIELDS email UNIQUE;
+-- ==========================================
+-- ROOMS TABLE
+-- ==========================================
+DEFINE TABLE room SCHEMAFULL;
+DEFINE FIELD name ON TABLE room TYPE string ASSERT $value != NONE;
+DEFINE FIELD members ON TABLE room TYPE array<string> DEFAULT [];
+DEFINE FIELD createdBy ON TABLE room TYPE string ASSERT $value != NONE;
+DEFINE FIELD createdAt ON TABLE room TYPE datetime DEFAULT time::now();
+DEFINE FIELD updatedAt ON TABLE room TYPE option<datetime>;
+DEFINE INDEX roomCreatedByIndex ON TABLE room FIELDS createdBy;
+-- ==========================================
+-- MESSAGES TABLE
+-- ==========================================
+DEFINE TABLE message SCHEMAFULL;
+DEFINE FIELD roomId ON TABLE message TYPE string ASSERT $value != NONE;
+DEFINE FIELD userId ON TABLE message TYPE string ASSERT $value != NONE;
+DEFINE FIELD content ON TABLE message TYPE string ASSERT $value != NONE;
+DEFINE FIELD isHidden ON TABLE message TYPE bool DEFAULT false;
+DEFINE FIELD timestamp ON TABLE message TYPE datetime DEFAULT time::now();
+DEFINE FIELD metadata ON TABLE message TYPE option<object>;
+DEFINE INDEX messageRoomIndex ON TABLE message FIELDS roomId;
+DEFINE INDEX messageUserIndex ON TABLE message FIELDS userId;
+DEFINE INDEX messageTimestampIndex ON TABLE message FIELDS timestamp;
+-- ==========================================
+-- ASSISTANTS TABLE
+-- ==========================================
+DEFINE TABLE assistant SCHEMAFULL;
+DEFINE FIELD name ON TABLE assistant TYPE string ASSERT $value != NONE;
+DEFINE FIELD model ON TABLE assistant TYPE string ASSERT $value != NONE;
+DEFINE FIELD provider ON TABLE assistant TYPE string ASSERT $value IN ['ollama', 'openai', 'anthropic'];
+DEFINE FIELD config ON TABLE assistant TYPE object DEFAULT {};
+DEFINE FIELD createdAt ON TABLE assistant TYPE datetime DEFAULT time::now();
+DEFINE INDEX assistantNameIndex ON TABLE assistant FIELDS name;
+-- ==========================================
+-- INVITES TABLE
+-- ==========================================
+DEFINE TABLE invite SCHEMAFULL;
+DEFINE FIELD code ON TABLE invite TYPE string ASSERT $value != NONE;
+DEFINE FIELD roomId ON TABLE invite TYPE string ASSERT $value != NONE;
+DEFINE FIELD expiresAt ON TABLE invite TYPE datetime ASSERT $value != NONE;
+DEFINE FIELD usedBy ON TABLE invite TYPE option<string>;
+DEFINE FIELD createdAt ON TABLE invite TYPE datetime DEFAULT time::now();
+DEFINE INDEX inviteCodeIndex ON TABLE invite FIELDS code UNIQUE;
+DEFINE INDEX inviteRoomIndex ON TABLE invite FIELDS roomId;

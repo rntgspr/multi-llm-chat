@@ -48,7 +48,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const room = getRoom(roomId)
+  const room = await getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 })
@@ -59,10 +59,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   const { searchParams } = new URL(request.url)
+  const page = parseInt(searchParams.get('page') || '1', 10)
   const limit = parseInt(searchParams.get('limit') || '50', 10)
   const since = searchParams.get('since')
 
-  const messages = messageStore.getByRoom(roomId, {
+  const messages = await messageStore.getByRoom(roomId, {
+    page,
     limit,
     since: since ? new Date(since) : undefined,
     publicOnly: true,
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const room = getRoom(roomId)
+  const room = await getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 })
@@ -108,7 +110,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     })
 
     // 1. Save user message
-    const message = messageStore.create({
+    const message = await messageStore.create({
       roomId,
       senderId: session.user.id,
       senderType: 'user',
@@ -119,7 +121,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const userMessageText = message.content.map((c) => (c.type === 'text' ? c.text : '')).join(' ')
 
     // 2. Get recent messages for context
-    const recentMessages = messageStore.getByRoom(roomId, { limit: 10, publicOnly: true })
+    const recentMessages = await messageStore.getByRoom(roomId, { limit: 10, publicOnly: true })
 
     // 3. Ask navigator which assistant should respond
     const routing = await navigator.route(message, {
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const responseContent = await sendToAssistant(assistantId, userMessageText, recentMessages)
 
         // Save assistant response
-        const assistantMessage = messageStore.create({
+        const assistantMessage = await messageStore.create({
           roomId,
           senderId: assistantId,
           senderType: 'assistant',

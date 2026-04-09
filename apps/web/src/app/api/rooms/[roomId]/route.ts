@@ -19,7 +19,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const room = getRoom(roomId)
+  const room = await getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 })
@@ -43,7 +43,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const room = getRoom(roomId)
+  const room = await getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 })
@@ -73,7 +73,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const room = getRoom(roomId)
+  const room = await getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 })
