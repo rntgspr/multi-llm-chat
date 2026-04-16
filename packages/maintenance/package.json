@@ -14,8 +14,10 @@
     "check": "biome check --write ."
   },
   "dependencies": {
+    "@auth/core": "^0.34.3",
     "@multi-llm/db": "workspace:*",
-    "@multi-llm/types": "workspace:*"
+    "@multi-llm/types": "workspace:*",
+    "ioredis": "^5.4.1"
   },
   "devDependencies": {
     "@types/node": "^20"

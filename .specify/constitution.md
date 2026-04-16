@@ -123,7 +123,7 @@ Todas as features seguem o fluxo **specify → plan → tasks → implement**. O
 
 Quando uma feature é **concluída**:
 1. Marcar o epic em `.specify/memory/epics/` como `[DONE]`
-2. Mover a pasta da spec para `.specify/specs/done/` (ex.: `specs/001-persistencia-surrealdb/` → `specs/done/001-persistencia-surrealdb/`)
+2. Mover a pasta da spec para `.specify/specs/done/` (ex.: `.specify/specs/001-persistencia-surrealdb/` → `.specify/specs/done/001-persistencia-surrealdb/`)
 3. Atualizar `STATUS.md`
 
 Specs concluídas servem como documentação histórica — úteis para onboarding e referência, sem poluir o diretório de trabalho ativo.

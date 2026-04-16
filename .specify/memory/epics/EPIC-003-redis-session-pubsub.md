@@ -1,10 +1,11 @@
 # Redis para Session Store e Pub/Sub — Epic Spec
 
-**Status:** [READY]  
+**Status:** [CONCLUÍDO ✅]  
 **Sprint:** 2  
 **Prioridade:** Alta  
 **Data de criação:** 2026-04-08  
-**Última atualização:** 2026-04-08
+**Última atualização:** 2026-04-16  
+**Data de conclusão:** 2026-04-16
 
 ---
 
@@ -78,13 +79,15 @@ Redis funcionando no Docker Compose, configurado como session store do NextAuth 
 
 ## ✅ Critérios de Aceite (Nível Épico)
 
-- [ ] Redis rodando no Docker Compose na porta 6379 com volume persistente
-- [ ] NextAuth armazena sessões no Redis (não mais em memória/JWT)
-- [ ] Sessões persistem entre restarts de apps/web
-- [ ] PubSubClient permite publish/subscribe de eventos tipados
-- [ ] Health check de Redis responde em menos de 50ms
-- [ ] Documentação de channels Pub/Sub está completa
-- [ ] `pnpm typecheck` passa sem erros
+- [x] Redis rodando no Docker Compose na porta 6379 com volume persistente
+- [x] NextAuth armazena sessões no Redis (não mais em memória/JWT)
+- [x] Sessões persistem entre restarts de apps/web
+- [x] PubSubClient permite publish/subscribe de eventos tipados
+- [x] Health check de Redis responde em menos de 50ms
+- [x] Documentação de channels Pub/Sub está completa
+- [x] `pnpm typecheck` passa sem erros
+
+**Resultado:** Todos os critérios atendidos. 90/90 tarefas concluídas com sucesso.
 
 ---
 

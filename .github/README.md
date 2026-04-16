@@ -91,24 +91,24 @@ Veja detalhes em: [plans/STATUS-ATUAL.md](./plans/STATUS-ATUAL.md)
 ## 🆘 Precisa de Ajuda?
 
 ### Orquestrador
-- Leia [sdd/processo.md](./sdd/processo.md) para processo completo
-- Use [templates/](./templates/) para criar specs/tasks
-- Consulte [sdd/GUIA-RAPIDO.md](./sdd/GUIA-RAPIDO.md) para comandos
+- Leia [sdd/processo.md](./.specify/sdd/processo.md) para processo completo
+- Use [templates/](./.specify/templates/) para criar specs/tasks
+- Consulte [sdd/GUIA-RAPIDO.md](./.specify/sdd/GUIA-RAPIDO.md) para comandos
 
 ### Backend Developer
-- Check [tasks/backend/TODO.md](./tasks/backend/TODO.md) para tasks pendentes
-- Leia specs em [specs/backend/](./specs/backend/)
-- Consulte [contracts/packages/](./contracts/packages/) para APIs
+- Check [tasks/backend/TODO.md](./.specify/tasks/backend/TODO.md) para tasks pendentes
+- Leia specs em [specs/backend/](./.specify/specs/backend/)
+- Consulte [contracts/packages/](./.specify/contracts/packages/) para APIs
 
 ### Frontend Developer
-- Check [tasks/frontend/TODO.md](./tasks/frontend/TODO.md) para tasks pendentes
-- Leia specs em [specs/frontend/](./specs/frontend/)
-- Consulte [contracts/api/](./contracts/api/) e [contracts/components/](./contracts/components/)
+- Check [tasks/frontend/TODO.md](./.specify/tasks/frontend/TODO.md) para tasks pendentes
+- Leia specs em [specs/frontend/](./.specify/specs/frontend/)
+- Consulte [contracts/api/](./.specify/contracts/api/) e [contracts/components/](./.specify/contracts/components/)
 
 ### Validador/QA
-- Check [tasks/validator/TODO.md](./tasks/validator/TODO.md) para validações pendentes
-- Use [templates/validation-report.md](./templates/validation-report.md) para criar reports
-- Valide contra specs em [specs/](./specs/)
+- Check [tasks/validator/TODO.md](./.specify/tasks/validator/TODO.md) para validações pendentes
+- Use [templates/validation-report.md](./.specify/templates/validation-report.md) para criar reports
+- Valide contra specs em [specs/](./.specify/specs/)
 
 ---
 
