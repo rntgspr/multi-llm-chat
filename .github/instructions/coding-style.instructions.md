@@ -1,5 +1,5 @@
 ---
-description: "Use when writing or reviewing TypeScript, React, or Next.js code. Enforces coding style, naming conventions, and SOLID/DRY principles."
+description: "Use ao escrever ou revisar código TypeScript, React ou Next.js. Aplica estilo de código, convenções de nomenclatura e princípios SOLID/DRY."
 applyTo: "**/*.{ts,tsx}"
 ---
 # Estilo de Código e Convenções

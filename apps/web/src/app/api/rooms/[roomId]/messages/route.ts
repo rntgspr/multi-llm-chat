@@ -1,6 +1,6 @@
 import { createFileContent, createImageContent, createTextContent, messageStore } from '@multi-llm/interaction'
 import { navigator, sendToAssistant } from '@multi-llm/interpretation'
-import { getRoom } from '@multi-llm/maintenance'
+import { getRoom } from '@multi-llm/platform'
 import { type NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 

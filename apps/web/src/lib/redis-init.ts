@@ -3,9 +3,9 @@
  * Establishes Redis connections and performs health check on startup
  */
 
-import { healthCheck } from "@multi-llm/maintenance";
+import { healthCheck } from '@multi-llm/platform'
 
-let isInitialized = false;
+let isInitialized = false
 
 /**
  * Initialize Redis connections
@@ -13,32 +13,28 @@ let isInitialized = false;
  */
 export async function initializeRedis(): Promise<void> {
   if (isInitialized) {
-    return;
+    return
   }
 
   try {
-    console.log("[Redis] Initializing connections...");
+    console.log('[Redis] Initializing connections...')
 
     // Perform health check
-    const health = await healthCheck();
+    const health = await healthCheck()
 
     if (!health.ok) {
-      throw new Error(
-        `Redis health check failed (latency: ${health.latencyMs}ms)`,
-      );
+      throw new Error(`Redis health check failed (latency: ${health.latencyMs}ms)`)
     }
 
     if (health.latencyMs > 50) {
-      console.warn(
-        `[Redis] Warning: High latency detected (${health.latencyMs}ms)`,
-      );
+      console.warn(`[Redis] Warning: High latency detected (${health.latencyMs}ms)`)
     }
 
-    console.log(`[Redis] Initialized successfully (latency: ${health.latencyMs}ms)`);
-    isInitialized = true;
+    console.log(`[Redis] Initialized successfully (latency: ${health.latencyMs}ms)`)
+    isInitialized = true
   } catch (error) {
-    console.error("[Redis] FATAL: Failed to initialize Redis:", error);
-    throw error;
+    console.error('[Redis] FATAL: Failed to initialize Redis:', error)
+    throw error
   }
 }
 
@@ -46,5 +42,5 @@ export async function initializeRedis(): Promise<void> {
  * Check if Redis is initialized
  */
 export function isRedisInitialized(): boolean {
-  return isInitialized;
+  return isInitialized
 }

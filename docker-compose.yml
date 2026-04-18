@@ -1,12 +1,17 @@
-# Multi-LLM Chat - Infrastructure Services
+# Multi-LLM Chat - Infrastructure Services (DB + Cache)
 #
 # Usage:
-#   docker compose up -d                    # Start infra (DB + Redis)
+#   docker compose up -d                    # Start infra only
 #   docker compose logs -f                  # View logs
 #   docker compose down                     # Stop all
 #
-# For LLM services, use docker-compose.llm.yml:
+# For apps (web + api):
+#   docker compose -f docker-compose.apps.yml up -d
+#
+# For LLM services (Ollama):
 #   docker compose -f docker-compose.llm.yml up -d
+
+name: multi-llm-chat
 
 services:
   # ==========================================================================

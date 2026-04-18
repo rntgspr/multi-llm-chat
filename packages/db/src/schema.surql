@@ -56,10 +56,15 @@ DEFINE INDEX idx_message_room_timestamp ON TABLE message COLUMNS roomId, timesta
 DEFINE TABLE assistant SCHEMAFULL;
 
 DEFINE FIELD name ON TABLE assistant TYPE string;
+DEFINE FIELD description ON TABLE assistant TYPE option<string>;
+DEFINE FIELD avatarUrl ON TABLE assistant TYPE option<string>;
 DEFINE FIELD model ON TABLE assistant TYPE string;
 DEFINE FIELD provider ON TABLE assistant TYPE string;
+DEFINE FIELD endpoint ON TABLE assistant TYPE string;
+DEFINE FIELD status ON TABLE assistant TYPE string DEFAULT "offline";
 DEFINE FIELD config ON TABLE assistant TYPE object DEFAULT {};
 DEFINE FIELD createdAt ON TABLE assistant TYPE datetime DEFAULT time::now();
+DEFINE FIELD updatedAt ON TABLE assistant TYPE option<datetime>;
 
 -- Indexes
 DEFINE INDEX idx_assistant_provider ON TABLE assistant COLUMNS provider;

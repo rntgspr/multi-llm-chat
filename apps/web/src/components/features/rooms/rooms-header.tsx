@@ -1,6 +1,7 @@
 'use client'
 
 import { LogOut, Plus } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
 
@@ -35,7 +36,15 @@ export function RoomsHeader({ user }: RoomsHeaderProps) {
           </Link>
 
           <div className="flex items-center gap-3">
-            {user.image && <img src={user.image} alt={user.name || 'Avatar'} className="h-8 w-8 rounded-full" />}
+            {user.image && (
+              <Image
+                src={user.image}
+                alt={user.name || 'Avatar'}
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-full"
+              />
+            )}
             <span className="text-sm text-foreground hidden sm:block">{user.name || user.email}</span>
             <button
               onClick={() => signOut({ callbackUrl: '/login' })}

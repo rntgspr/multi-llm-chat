@@ -35,14 +35,15 @@ export function useWebSocket(userId: UserId): UseWebSocketReturn {
     if (initialized.current) return
     initialized.current = true
 
-    const socket = connect(userId)
+    // Connect is async, so we need to handle it properly
+    connect(userId).then((socket) => {
+      socket.on('connect', () => {
+        setConnected(true)
+      })
 
-    socket.on('connect', () => {
-      setConnected(true)
-    })
-
-    socket.on('disconnect', () => {
-      setConnected(false)
+      socket.on('disconnect', () => {
+        setConnected(false)
+      })
     })
 
     const cancelMessage = onMessage((event) => {

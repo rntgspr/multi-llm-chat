@@ -1,4 +1,14 @@
 
+
 > @multi-llm/api@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/apps/api
 > tsc --noEmit
 
+[96msrc/websocket/server.ts[0m:[93m71[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m71[0m }
+[7m  [0m [91m~[0m
+
+
+Found 1 error in src/websocket/server.ts[90m:71[0m
+
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 2.[39m

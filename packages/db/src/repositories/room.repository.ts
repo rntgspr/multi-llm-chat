@@ -44,10 +44,14 @@ export class RoomRepository {
   async findByMember(userId: string): Promise<Room[]> {
     try {
       const db = await getDB()
-      return await query<Room>(db, 'SELECT * FROM room WHERE $userId IN participants ORDER BY createdAt DESC', {
+      console.log('[RoomRepository] Finding rooms for userId:', userId)
+      const result = await query<Room>(db, 'SELECT * FROM room WHERE $userId IN participants ORDER BY createdAt DESC', {
         userId,
       })
+      console.log('[RoomRepository] Found rooms:', result.length)
+      return result
     } catch (error) {
+      console.error('[RoomRepository] Error finding by member:', error)
       handleDBError(error)
     }
   }

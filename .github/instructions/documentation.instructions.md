@@ -1,5 +1,5 @@
 ---
-description: "Use when writing or reviewing JSDoc comments, README files, or inline documentation for TypeScript/React code."
+description: "Use ao escrever ou revisar comentários JSDoc, arquivos README ou documentação inline para código TypeScript/React."
 applyTo: "**/*.{ts,tsx}"
 ---
 # Padrões de Documentação

@@ -3,18 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "pnpm docker:up && turbo dev",
+    "dev:full": "pnpm docker:up && pnpm docker:llm:up && turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
     "check": "turbo check",
     "typecheck": "turbo typecheck",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:llm:up": "docker compose -f docker-compose.llm.yml up -d",
+    "docker:llm:down": "docker compose -f docker-compose.llm.yml down",
+    "docker:logs": "docker compose logs -f",
+    "docker:logs:llm": "docker compose -f docker-compose.llm.yml logs -f",
+    "stop": "pnpm docker:down && pnpm docker:llm:down"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
+    "@biomejs/biome": "^2.4.12",
     "tsx": "^4.21.0",
-    "turbo": "^2.5.4",
-    "typescript": "^5"
+    "turbo": "^2.9.6",
+    "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@10.12.1"
 }

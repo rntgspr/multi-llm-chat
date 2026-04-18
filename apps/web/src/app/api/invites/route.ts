@@ -1,4 +1,4 @@
-import { createInvite, getRoom } from '@multi-llm/maintenance'
+import { createInvite, getRoom } from '@multi-llm/platform'
 import { type NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 

@@ -1,8 +1,12 @@
-# Multi-LLM Chat - Local LLM Services (Ollama)
+# Multi-LLM Chat - LLM Services (Ollama)
+#
+# Prerequisites: Core services must be running first
+#   docker compose up -d
 #
 # Usage:
 #   docker compose -f docker-compose.llm.yml up -d        # Start all LLMs
-#   docker compose -f docker-compose.llm.yml down          # Stop all LLMs
+#   docker compose -f docker-compose.llm.yml logs -f      # View logs
+#   docker compose -f docker-compose.llm.yml down         # Stop all LLMs
 #
 # Pull models after starting:
 #   docker exec ollama-orchestrator ollama pull llama3.2
@@ -10,8 +14,12 @@
 #   docker exec ollama-code ollama pull codellama:7b
 #   docker exec ollama-creative ollama pull llama3.2
 
+name: multi-llm-agents
+
 x-ollama: &ollama-base
   image: ollama/ollama
+  env_file:
+    - .env.local
   environment:
     - OLLAMA_HOST=0.0.0.0
   healthcheck:

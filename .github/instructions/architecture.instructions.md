@@ -1,5 +1,5 @@
 ---
-description: "Use when designing components, organizing files, or structuring features in a Next.js App Router project. Covers architecture patterns and project structure."
+description: "Use ao projetar componentes, organizar arquivos ou estruturar features em um projeto Next.js App Router. Cobre padrões de arquitetura e estrutura de projeto."
 ---
 # Padrões de Arquitetura
 

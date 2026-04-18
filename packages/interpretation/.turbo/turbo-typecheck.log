@@ -1,25 +1,5 @@
 
+
 > @multi-llm/interpretation@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/interpretation
 > tsc --noEmit
 
-src/assistants/ollama-adapter.ts(54,28): error TS2339: Property 'endpoint' does not exist on type 'Promise<Assistant | undefined>'.
-src/assistants/ollama-adapter.ts(56,45): error TS2339: Property 'name' does not exist on type 'Promise<Assistant | undefined>'.
-src/assistants/ollama-adapter.ts(56,64): error TS2339: Property 'description' does not exist on type 'Promise<Assistant | undefined>'.
-src/assistants/ollama-adapter.ts(65,59): error TS2339: Property 'name' does not exist on type 'Promise<Assistant | undefined>'.
-src/assistants/ollama-adapter.ts(104,65): error TS2339: Property 'name' does not exist on type 'Promise<Assistant | undefined>'.
-src/assistants/registry.ts(60,42): error TS2345: Argument of type '{ id: string; name: string; description: string; avatarUrl?: string | undefined; endpoint: string; status: AssistantStatus; }' is not assignable to parameter of type 'CreateAssistantInput'.
-  Type '{ id: string; name: string; description: string; avatarUrl?: string | undefined; endpoint: string; status: AssistantStatus; }' is missing the following properties from type 'CreateAssistantInput': model, provider, config
-src/assistants/registry.ts(76,5): error TS2322: Type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/db/assistant").Assistant[]' is not assignable to type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/index").Assistant[]'.
-  Type 'Assistant' is missing the following properties from type 'Assistant': description, endpoint, status
-src/assistants/registry.ts(89,5): error TS2322: Type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/db/assistant").Assistant[]' is not assignable to type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/index").Assistant[]'.
-  Type 'Assistant' is missing the following properties from type 'Assistant': description, endpoint, status
-src/assistants/registry.ts(89,32): error TS2339: Property 'status' does not exist on type 'Assistant'.
-src/assistants/registry.ts(102,5): error TS2322: Type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/db/assistant").Assistant | undefined' is not assignable to type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/index").Assistant | undefined'.
-  Type 'Assistant' is missing the following properties from type 'Assistant': description, endpoint, status
-src/assistants/registry.ts(114,53): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type 'Partial<Omit<Assistant, "id" | "createdAt">>'.
-src/assistants/registry.ts(130,38): error TS2345: Argument of type 'Omit<Assistant, "id"> & { id: string; }' is not assignable to parameter of type 'CreateAssistantInput'.
-  Type 'Omit<Assistant, "id"> & { id: string; }' is missing the following properties from type 'CreateAssistantInput': model, provider, config
-src/assistants/registry.ts(160,23): error TS2339: Property 'status' does not exist on type 'Assistant'.
-src/navigator/llm-router.ts(59,28): error TS2339: Property 'find' does not exist on type 'Promise<Assistant[]>'.
-src/navigator/llm-router.ts(59,34): error TS7006: Parameter 'x' implicitly has an 'any' type.
- ELIFECYCLE  Command failed with exit code 2.

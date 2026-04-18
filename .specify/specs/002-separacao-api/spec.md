@@ -94,13 +94,14 @@ Como mantenedor da codebase, preciso que API routes antigas sejam removidas de a
 
 ### Edge Cases
 
-- O que acontece quando apps/api (WebSocket) está down mas apps/web está rodando? Usuários devem ver mensagens de "chat offline" mas ainda podem navegar e executar Server Actions.
+- **When apps/api (WebSocket) está down mas apps/web está rodando**: Usuários devem ver graceful degradation com optimistic updates - a UI permite enviar mensagens que aparecem localmente com indicador de "pendente", e Server Actions salvam no DB normalmente. Quando apps/api volta, mensagens pendentes são sincronizadas via WebSocket.
 - Como Server Actions lidam com operações de longa duração (ex: processamento de LLM)? Devem ter timeout adequado e feedback visual de progresso.
 - E se a sessão de um usuário expira durante execução de um Server Action? O action deve falhar com erro específico e redirecionar para login.
 - Como WebSocket lida com reconnection storms quando apps/api reinicia? Deve implementar jittered reconnection delays e rate limiting.
-- O que acontece se um Server Action tenta emitir evento WebSocket mas apps/api está down? Deve logar erro mas não falhar a operação primária (ex: mensagem é salva mas broadcast falha).
-- Como garantir que Server Actions e WebSocket usam os mesmos managers/repositories? Devem compartilhar packages `@multi-llm/db`, `@multi-llm/maintenance`, etc.
+- **Quando Server Action salva dados com sucesso mas Redis Pub/Sub falha no broadcast para apps/api**: Sistema usa local echo + eventual consistency - mensagem aparece imediatamente na UI do remetente (optimistic), é salva no DB, mas se Redis falhar, outros usuários só verão quando fizerem polling/refresh ou quando Redis se recuperar e reprocessar eventos pendentes.
+- Como garantir que Server Actions e WebSocket usam os mesmos managers/repositories? Devem compartilhar packages `@multi-llm/db`, `@multi-llm/platform`, etc.
 - E se múltiplas abas estão abertas e uma envia mensagem via Server Action? O WebSocket deve propagar para todas as abas do mesmo usuário também.
+- **Para debugging de falhas de entrega de mensagens na arquitetura distribuída**: Sistema deve implementar Correlation IDs propagados através de logs com structured logging - cada operação recebe um correlation ID único que é passado de Server Action → Redis → WebSocket → Cliente, permitindo rastrear toda a jornada nos logs estruturados.
 
 ## Requirements *(obrigatório)*
 
@@ -132,44 +133,49 @@ Como mantenedor da codebase, preciso que API routes antigas sejam removidas de a
 - **FR-019**: O sistema DEVE retornar erros tipados de Server Actions para tratamento no frontend
 
 #### Integration Between Server Actions and WebSocket
-- **FR-020**: O sistema DEVE permitir que Server Actions emitam eventos WebSocket após operações bem-sucedidas
-- **FR-021**: O sistema DEVE usar HTTP client (fetch/axios) de Server Actions para comunicar com apps/api quando necessário
-- **FR-022**: O sistema DEVE garantir que Server Actions e WebSocket compartilhem packages de domínio (@multi-llm/db, @multi-llm/maintenance)
-- **FR-023**: O sistema DEVE implementar fallback gracioso se WebSocket estiver indisponível durante Server Action
+- **FR-020**: O sistema DEVE permitir que Server Actions emitam eventos WebSocket após operações bem-sucedidas via Redis Pub/Sub
+- **FR-021**: O sistema DEVE publicar eventos em canais Redis após Server Actions completarem (ex: `chat:room:{roomId}:message`) com correlation ID incluído no payload
+- **FR-022**: O sistema DEVE fazer apps/api subscrever canais Redis e propagar eventos via WebSocket para clientes conectados, preservando correlation ID
+- **FR-023**: O sistema DEVE garantir que Server Actions e WebSocket compartilhem packages de domínio (@multi-llm/db, @multi-llm/platform)
+- **FR-024**: O sistema DEVE implementar fallback gracioso se Redis estiver indisponível durante Server Action usando local echo + eventual consistency (salva dados no DB, retorna sucesso ao cliente com optimistic update, mas não faz broadcast em tempo real)
 
 #### Authentication & Session Validation
-- **FR-024**: O sistema DEVE manter NextAuth rodando em apps/web para autenticação de usuários
-- **FR-025**: O sistema DEVE criar middleware em apps/api para validar sessões NextAuth em conexões WebSocket
-- **FR-026**: O sistema DEVE compartilhar chave secreta de sessão entre apps/web e apps/api via variáveis de ambiente
-- **FR-027**: O sistema DEVE transmitir token/cookie de sessão do cliente para apps/api durante handshake WebSocket
+- **FR-025**: O sistema DEVE manter NextAuth rodando em apps/web para autenticação de usuários
+- **FR-026**: O sistema DEVE criar middleware em apps/api para validar sessões NextAuth em conexões WebSocket usando validação de JWT token com chave secreta compartilhada
+- **FR-027**: O sistema DEVE compartilhar chave secreta JWT entre apps/web e apps/api via variáveis de ambiente (NEXTAUTH_SECRET)
+- **FR-028**: O sistema DEVE transmitir JWT token de sessão do cliente para apps/api durante handshake WebSocket via query parameter ou auth header
 
 #### Configuration & Environment
-- **FR-028**: O sistema DEVE adicionar NEXT_PUBLIC_WS_URL ao .env.example apontando para http://localhost:4000
-- **FR-029**: O sistema DEVE documentar todas as variáveis de ambiente necessárias no README
-- **FR-030**: O sistema DEVE validar variáveis de ambiente requeridas no startup de apps/api
-- **FR-031**: O sistema DEVE falhar rapidamente (fail-fast) se variáveis críticas estiverem faltando
+- **FR-029**: O sistema DEVE adicionar NEXT_PUBLIC_WS_URL ao .env.example apontando para http://localhost:4000
+- **FR-030**: O sistema DEVE adicionar REDIS_URL ao .env.example para conexão Redis Pub/Sub
+- **FR-031**: O sistema DEVE adicionar NEXTAUTH_SECRET compartilhado ao .env.example para validação JWT entre apps/web e apps/api
+- **FR-032**: O sistema DEVE documentar todas as variáveis de ambiente necessárias no README
+- **FR-033**: O sistema DEVE validar variáveis de ambiente requeridas no startup de apps/api
+- **FR-034**: O sistema DEVE falhar rapidamente (fail-fast) se variáveis críticas estiverem faltando
 
 #### Frontend Client Updates
-- **FR-032**: O sistema DEVE atualizar use-websocket.ts em apps/web para conectar a NEXT_PUBLIC_WS_URL
-- **FR-033**: O sistema DEVE remover clients de API REST do frontend (já que Server Actions substituem)
-- **FR-034**: O sistema DEVE incluir cookies/tokens de sessão em conexão WebSocket
-- **FR-035**: O sistema DEVE implementar error handling para falhas de WebSocket (network errors, 401, desconexões)
+- **FR-035**: O sistema DEVE atualizar use-websocket.ts em apps/web para conectar a NEXT_PUBLIC_WS_URL
+- **FR-036**: O sistema DEVE remover clients de API REST do frontend (já que Server Actions substituem)
+- **FR-037**: O sistema DEVE incluir JWT token de sessão NextAuth em conexão WebSocket via query parameter ou auth header
+- **FR-038**: O sistema DEVE implementar error handling para falhas de WebSocket com graceful degradation (network errors, 401, desconexões) mostrando optimistic updates quando WebSocket está offline
 
 #### Code Cleanup
-- **FR-036**: O sistema DEVE remover todos os arquivos de API routes de apps/web/src/app/api/*
-- **FR-037**: O sistema DEVE remover apps/web/src/server.ts e lógica customizada de servidor Next.js
-- **FR-038**: O sistema DEVE remover imports não utilizados relacionados a Socket.io de apps/web
-- **FR-039**: O sistema DEVE garantir que apps/web usa servidor Next.js padrão após cleanup
+- **FR-039**: O sistema DEVE remover todos os arquivos de API routes de apps/web/src/app/api/*
+- **FR-040**: O sistema DEVE remover apps/web/src/server.ts e lógica customizada de servidor Next.js
+- **FR-041**: O sistema DEVE remover imports não utilizados relacionados a Socket.io de apps/web
+- **FR-042**: O sistema DEVE garantir que apps/web usa servidor Next.js padrão após cleanup
 
 ### Non-Functional Requirements
 
 - **NFR-001**: Latência de mensagens via WebSocket DEVE ser menor que 1 segundo em 99% dos casos
 - **NFR-002**: WebSocket DEVE suportar pelo menos 1000 conexões concorrentes
 - **NFR-003**: apps/api DEVE incluir endpoint /health que responde em menos de 100ms
-- **NFR-004**: Validação de sessão em WebSocket middleware DEVE adicionar menos de 50ms de latência no handshake
+- **NFR-004**: Validação de sessão JWT em WebSocket middleware DEVE adicionar menos de 50ms de latência no handshake
 - **NFR-005**: Server Actions DEVEM completar em menos de 3 segundos para operações CRUD simples
-- **NFR-006**: O sistema DEVE logar todas as falhas de autenticação para auditoria
-- **NFR-007**: apps/api DEVE implementar graceful shutdown para permitir deploys sem perda de conexões
+- **NFR-006**: O sistema DEVE implementar structured logging com correlation IDs em todos os componentes (Server Actions, Redis Pub/Sub, WebSocket handlers) para rastreabilidade end-to-end
+- **NFR-007**: O sistema DEVE logar todas as falhas de autenticação JWT para auditoria
+- **NFR-008**: apps/api DEVE implementar graceful shutdown para permitir deploys sem perda de conexões
+- **NFR-009**: Correlation IDs DEVEM ser gerados no Server Action e propagados através de Redis events até os logs do WebSocket, permitindo rastrear uma operação completa nos logs estruturados
 
 ## Success Criteria *(obrigatório)*
 
@@ -189,13 +195,28 @@ Como mantenedor da codebase, preciso que API routes antigas sejam removidas de a
 
 ## Assumptions
 
-- NextAuth já está configurado e funcionando em apps/web
-- SurrealDB (EPIC-001) já está funcionando e acessível por apps/web (Server Actions) e apps/api
-- Packages compartilhados (@multi-llm/db, @multi-llm/interaction, @multi-llm/maintenance) podem ser consumidos tanto por apps/web quanto apps/api
+- NextAuth já está configurado e funcionando em apps/web com suporte a JWT tokens
+- NextAuth JWT tokens podem ser validados em apps/api usando NEXTAUTH_SECRET compartilhado
+- SurrealDB (EPIC-001) está funcionando para persistência de histórico e dados frios
+- Redis (EPIC-003) está funcionando para sessions, cache, pub/sub e hot storage
+- **Redis é o hot storage primário para conversas ativas** - mensagens recentes armazenadas no Redis para leitura ultra-rápida
+- **apps/api acessa APENAS Redis** (zero acesso direto ao SurrealDB) - toda persistência vai via apps/workers
+- **apps/web acessa SurrealDB e Redis** - Server Actions escrevem no SurrealDB para dados persistentes e no Redis para dados hot
+- apps/workers faz sync assíncrono Redis → SurrealDB (background jobs de persistência)
+- Packages compartilhados (@multi-llm/db, @multi-llm/interaction, @multi-llm/platform) podem ser consumidos tanto por apps/web quanto apps/api
 - Next.js suporta Server Actions na versão instalada
-- Desenvolvedores possuem acesso às portas 3000 (Next.js) e 4000 (WebSocket) em suas máquinas locais
+- Desenvolvedores possuem acesso às portas 3000 (Next.js), 4000 (WebSocket) e 6379 (Redis) em suas máquinas locais
 - Não há necessidade de API REST externa - todos os clientes consomem via Next.js (SSR + Server Actions)
 - Produção usará um reverse proxy ou load balancer para rotear tráfego WebSocket
-- Sessões NextAuth usam tokens JWT ou cookies HTTP-only que podem ser validados em apps/api
-- Não há requisitos de migração de dados existentes (toda persistência já está em SurrealDB via EPIC-001)
-- Server Actions podem fazer HTTP calls para apps/api quando precisarem emitir eventos WebSocket
+- Sistema de logs estruturados (JSON logging) já está configurado ou será facilmente integrável
+- Clients podem tolerar eventual consistency quando Redis está indisponível (optimistic updates + local echo)
+
+## Clarifications
+
+### Session 2026-04-08
+
+- Q: How should Server Actions in apps/web trigger WebSocket broadcasts in apps/api? → A: C - Redis Pub/Sub
+- Q: How should WebSocket authentication work when validating NextAuth sessions? → A: B - JWT token validation with shared secret
+- Q: When apps/api (WebSocket server) is down but apps/web is running, how should the UI behave for chat functionality? → A: A - Graceful degradation with optimistic updates
+- Q: When a Server Action successfully saves data but Redis Pub/Sub fails to deliver the broadcast event to apps/api, how should the system behave? → A: B - Local echo + eventual consistency
+- Q: When debugging a message delivery failure across the distributed architecture, how should the system enable tracing and correlation? → A: C - Correlation IDs propagated through logs with structured logging

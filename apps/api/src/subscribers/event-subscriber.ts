@@ -1,122 +1,164 @@
 /**
- * Event Subscriber Example
- * Demonstrates how to subscribe to events using Redis Pub/Sub
+ * Redis Event Subscriber → WebSocket Bridge
+ * Subscribes to Redis Pub/Sub events and broadcasts them to WebSocket clients
  */
 
-import { getSubscriber } from "@multi-llm/maintenance";
+import { CHANNELS, getSubscriber } from '@multi-llm/platform'
 import type {
   MessageSentPayload,
-  UserStatusChangedPayload,
+  MessageUpdatedPayload,
+  MessageDeletedPayload,
+  RoomMemberJoinedPayload,
+  RoomMemberLeftPayload,
   PubSubEnvelope,
-} from "@multi-llm/maintenance";
+} from '@multi-llm/platform'
+
+import { getSocketServer } from '../websocket/server.js'
+import { logger, createCorrelatedLogger } from '../lib/logger.js'
 
 /**
- * Example: Subscribe to chat message sent events
+ * Subscribe to chat.message.sent and broadcast to /chat namespace
  */
-export async function subscribeToMessageSent(): Promise<() => void> {
-  const subscriber = getSubscriber();
+async function subscribeToMessageSent(): Promise<() => void> {
+  const subscriber = getSubscriber()
 
   const unsubscribe = await subscriber.subscribe<MessageSentPayload>(
-    "chat.message.sent",
+    CHANNELS.CHAT.MESSAGE_SENT,
     (message: PubSubEnvelope<MessageSentPayload>) => {
-      console.log(
-        `[API] Received message.sent event: ${message.payload.messageId}`,
-      );
-      console.log(`  Room: ${message.payload.roomId}`);
-      console.log(`  User: ${message.payload.userId}`);
-      console.log(`  Content: ${message.payload.content}`);
+      const { roomId, messageId, userId, content } = message.payload
+      const correlationId = message.correlationId || message.messageId
 
-      // Handle the event (e.g., update database, notify WebSocket clients, etc.)
-      handleMessageSent(message.payload);
+      const log = createCorrelatedLogger(correlationId)
+      log.info(
+        { roomId, messageId, userId, channel: message.channel },
+        'Broadcasting message:new to WebSocket clients',
+      )
+
+      try {
+        const io = getSocketServer()
+        const chatNamespace = io.of('/chat')
+
+        // Broadcast to all clients in the room
+        chatNamespace.to(roomId).emit('message:new', {
+          messageId,
+          roomId,
+          userId,
+          content,
+          timestamp: message.timestamp,
+          correlationId,
+        })
+
+        log.info({ roomId, messageId }, 'Message broadcasted successfully')
+      } catch (error) {
+        log.error({ error, roomId, messageId }, 'Failed to broadcast message')
+      }
     },
-  );
+  )
 
-  console.log("[API] Subscribed to chat.message.sent");
-
-  return unsubscribe;
+  logger.info('Subscribed to chat.message.sent')
+  return unsubscribe
 }
 
 /**
- * Example: Subscribe to user status changed events
+ * Subscribe to room.member.joined and broadcast to /chat namespace
  */
-export async function subscribeToUserStatusChanged(): Promise<() => void> {
-  const subscriber = getSubscriber();
+async function subscribeToMemberJoined(): Promise<() => void> {
+  const subscriber = getSubscriber()
 
-  const unsubscribe = await subscriber.subscribe<UserStatusChangedPayload>(
-    "user.status.changed",
-    async (message: PubSubEnvelope<UserStatusChangedPayload>) => {
-      console.log(
-        `[API] User ${message.payload.userId} status: ${message.payload.status}`,
-      );
+  const unsubscribe = await subscriber.subscribe<RoomMemberJoinedPayload>(
+    CHANNELS.ROOM.MEMBER_JOINED,
+    (message: PubSubEnvelope<RoomMemberJoinedPayload>) => {
+      const { roomId, userId } = message.payload
+      const correlationId = message.correlationId || message.messageId
 
-      // Handle the event asynchronously
-      await handleUserStatusChanged(message.payload);
+      const log = createCorrelatedLogger(correlationId)
+      log.info(
+        { roomId, userId, channel: message.channel },
+        'Broadcasting member:joined to WebSocket clients',
+      )
+
+      try {
+        const io = getSocketServer()
+        const chatNamespace = io.of('/chat')
+
+        chatNamespace.to(roomId).emit('member:joined', {
+          userId,
+          roomId,
+          timestamp: message.timestamp,
+          correlationId,
+        })
+
+        log.info({ roomId, userId }, 'Member joined event broadcasted')
+      } catch (error) {
+        log.error({ error, roomId, userId }, 'Failed to broadcast member:joined')
+      }
     },
-  );
+  )
 
-  console.log("[API] Subscribed to user.status.changed");
-
-  return unsubscribe;
+  logger.info('Subscribed to room.member.joined')
+  return unsubscribe
 }
 
 /**
- * Example: Subscribe to multiple channels
+ * Subscribe to room.member.left and broadcast to /chat namespace
+ */
+async function subscribeToMemberLeft(): Promise<() => void> {
+  const subscriber = getSubscriber()
+
+  const unsubscribe = await subscriber.subscribe<RoomMemberLeftPayload>(
+    CHANNELS.ROOM.MEMBER_LEFT,
+    (message: PubSubEnvelope<RoomMemberLeftPayload>) => {
+      const { roomId, userId } = message.payload
+      const correlationId = message.correlationId || message.messageId
+
+      const log = createCorrelatedLogger(correlationId)
+      log.info(
+        { roomId, userId, channel: message.channel },
+        'Broadcasting member:left to WebSocket clients',
+      )
+
+      try {
+        const io = getSocketServer()
+        const chatNamespace = io.of('/chat')
+
+        chatNamespace.to(roomId).emit('member:left', {
+          userId,
+          roomId,
+          timestamp: message.timestamp,
+          correlationId,
+        })
+
+        log.info({ roomId, userId }, 'Member left event broadcasted')
+      } catch (error) {
+        log.error({ error, roomId, userId }, 'Failed to broadcast member:left')
+      }
+    },
+  )
+
+  logger.info('Subscribed to room.member.left')
+  return unsubscribe
+}
+
+/**
+ * Subscribe to all events and bridge to WebSocket
  */
 export async function subscribeToAllEvents(): Promise<() => void> {
-  const subscriber = getSubscriber();
+  logger.info('Starting all event subscribers...')
 
-  // Subscribe to all chat-related events
   const unsubscribes = await Promise.all([
-    subscriber.subscribe("chat.message.sent", handleChatEvent),
-    subscriber.subscribe("chat.message.updated", handleChatEvent),
-    subscriber.subscribe("chat.message.deleted", handleChatEvent),
-    subscriber.subscribe("room.member.joined", handleRoomEvent),
-    subscriber.subscribe("room.member.left", handleRoomEvent),
-  ]);
+    subscribeToMessageSent(),
+    subscribeToMemberJoined(),
+    subscribeToMemberLeft(),
+  ])
 
-  console.log("[API] Subscribed to all chat and room events");
+  logger.info('All event subscribers initialized')
 
   // Return a function that unsubscribes from all channels
   return async () => {
+    logger.info('Unsubscribing from all events...')
     for (const unsubscribe of unsubscribes) {
-      await unsubscribe();
+      await unsubscribe()
     }
-    console.log("[API] Unsubscribed from all events");
-  };
-}
-
-/**
- * Handle message sent event
- */
-function handleMessageSent(payload: MessageSentPayload): void {
-  // Example: Broadcast to WebSocket clients in the room
-  // Example: Update message search index
-  // Example: Send push notifications
-  console.log(`[Handler] Processing message ${payload.messageId}`);
-}
-
-/**
- * Handle user status changed event
- */
-async function handleUserStatusChanged(
-  payload: UserStatusChangedPayload,
-): Promise<void> {
-  // Example: Update user status in database
-  // Example: Notify friends/contacts
-  // Example: Update presence indicators
-  console.log(`[Handler] User ${payload.userId} is now ${payload.status}`);
-}
-
-/**
- * Generic chat event handler
- */
-function handleChatEvent(message: PubSubEnvelope<unknown>): void {
-  console.log(`[Handler] Chat event: ${message.type} on ${message.channel}`);
-}
-
-/**
- * Generic room event handler
- */
-function handleRoomEvent(message: PubSubEnvelope<unknown>): void {
-  console.log(`[Handler] Room event: ${message.type} on ${message.channel}`);
+    logger.info('All event subscribers stopped')
+  }
 }

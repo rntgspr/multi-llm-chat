@@ -1,8 +1,8 @@
-# Feature Specification: Persistência com SurrealDB
+# Especificação de Feature: Persistência com SurrealDB
 
-**Feature Branch**: `001-persistencia-surrealdb`  
-**Created**: 2026-04-07  
-**Status**: ✅ Implemented (2026-04-07)  
+**Branch da Feature**: `001-persistencia-surrealdb`  
+**Criado**: 2026-04-07  
+**Status**: ✅ Implementado (2026-04-07)  
 **Input**: User description: "Introduzir SurrealDB como camada de persistência, substituindo completamente o armazenamento in-memory (Map/arrays nos managers) sem alterar as interfaces públicas dos managers. O sistema deve ler e gravar todos os dados (Users, Rooms, Messages, Assistants, Invites) no SurrealDB via repositories type-safe."
 
 ## User Scenarios & Testing *(mandatory)*
