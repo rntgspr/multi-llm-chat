@@ -1,4 +1,4 @@
-import type { ChatEvent, RoomId } from '@multi-llm/types'
+import type { ChatEvent, RoomId } from '@synergy/types'
 
 type EventHandler = (event: ChatEvent) => void
 type RoomEventHandler = (event: ChatEvent) => void

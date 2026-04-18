@@ -1,4 +1,4 @@
-import { createRoom, listUserRooms } from '@multi-llm/platform'
+import { createRoom, listUserRooms } from '@synergy/platform'
 import { type NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 

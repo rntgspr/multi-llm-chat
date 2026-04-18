@@ -1,4 +1,4 @@
-import { addAssistant, deleteRoom, getRoom, removeAssistant } from '@multi-llm/platform'
+import { addAssistant, deleteRoom, getRoom, removeAssistant } from '@synergy/platform'
 import { type NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 

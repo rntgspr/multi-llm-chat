@@ -1,4 +1,4 @@
-import type { ChannelId, ChannelType, IncomingMessage, OutgoingMessage } from '@multi-llm/types'
+import type { ChannelId, ChannelType, IncomingMessage, OutgoingMessage } from '@synergy/types'
 
 /**
  * Interface that all communication channels must implement.

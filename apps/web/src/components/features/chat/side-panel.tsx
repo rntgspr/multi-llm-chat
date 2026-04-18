@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Bot, Check, Copy, Link2, Loader2, Users } from 'lucide-react'
 import { useState } from 'react'
 
-import type { AssistantId, AssistantStatus, Invite, Room } from '@multi-llm/types'
+import type { AssistantId, AssistantStatus, Invite, Room } from '@synergy/types'
 
 interface AssistantHealth {
   id: AssistantId

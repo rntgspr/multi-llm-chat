@@ -1,8 +1,8 @@
 /**
- * Re-export all types from @multi-llm/types
+ * Re-export all types from @synergy/types
  * and add backward compatibility aliases
  */
-export * from '@multi-llm/types'
+export * from '@synergy/types'
 
 // Legacy aliases for backward compatibility
 // TODO: Remove these after full migration
@@ -12,4 +12,4 @@ export type {
   NavigatorConfig as OrchestratorConfig,
   NavigatorDecision as OrchestratorDecision,
   SenderType as LegacySenderType,
-} from '@multi-llm/types'
+} from '@synergy/types'

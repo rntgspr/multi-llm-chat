@@ -1,5 +1,5 @@
 {
-  "name": "@multi-llm/platform",
+  "name": "@synergy/platform",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@auth/core": "^0.34.3",
-    "@multi-llm/db": "workspace:*",
-    "@multi-llm/types": "workspace:*",
+    "@synergy/db": "workspace:*",
+    "@synergy/types": "workspace:*",
     "ioredis": "^5.4.1"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@
  * Establishes Redis connections and starts event subscribers on startup
  */
 
-import { getSubscriber, healthCheck } from '@multi-llm/platform'
+import { getSubscriber, healthCheck } from '@synergy/platform'
 
 import { subscribeToAllEvents } from '../subscribers/event-subscriber'
 

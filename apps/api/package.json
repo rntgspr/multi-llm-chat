@@ -1,5 +1,5 @@
 {
-  "name": "@multi-llm/api",
+  "name": "@synergy/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,10 +11,10 @@
     "check": "biome check --write ."
   },
   "dependencies": {
-    "@multi-llm/interaction": "workspace:*",
-    "@multi-llm/interpretation": "workspace:*",
-    "@multi-llm/platform": "workspace:*",
-    "@multi-llm/types": "workspace:*",
+    "@synergy/interaction": "workspace:*",
+    "@synergy/interpretation": "workspace:*",
+    "@synergy/platform": "workspace:*",
+    "@synergy/types": "workspace:*",
     "hono": "^4.12.9",
     "jose": "^6.2.2",
     "pino": "^10.3.1",

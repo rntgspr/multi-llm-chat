@@ -1,4 +1,4 @@
-import { listAssistants, listOnlineAssistants } from '@multi-llm/interpretation'
+import { listAssistants, listOnlineAssistants } from '@synergy/interpretation'
 import { NextResponse } from 'next/server'
 
 import { auth } from '@/lib/auth'

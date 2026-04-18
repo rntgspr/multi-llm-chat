@@ -1,4 +1,4 @@
-import { listAssistants } from '@multi-llm/interpretation'
+import { listAssistants } from '@synergy/interpretation'
 
 import type { AssistantId } from '@/types'
 

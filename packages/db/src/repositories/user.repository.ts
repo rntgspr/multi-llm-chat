@@ -4,7 +4,7 @@ import { getDB } from '../lib/db'
 import { handleDBError, toStringId } from '../lib/db-errors'
 import { query, queryOne } from '../lib/db-helpers'
 
-import type { CreateUserInput, UpdateUserInput, User } from '@multi-llm/types/db'
+import type { CreateUserInput, UpdateUserInput, User } from '@synergy/types/db'
 
 export class UserRepository {
   private table = new Table('user')

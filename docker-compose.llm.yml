@@ -1,4 +1,4 @@
-# Multi-LLM Chat - LLM Services (Ollama)
+# Synergy Chat - LLM Services (Ollama)
 #
 # Prerequisites: Core services must be running first
 #   docker compose up -d
@@ -14,7 +14,7 @@
 #   docker exec ollama-code ollama pull codellama:7b
 #   docker exec ollama-creative ollama pull llama3.2
 
-name: multi-llm-agents
+name: synergy-agents
 
 x-ollama: &ollama-base
   image: ollama/ollama
@@ -29,7 +29,7 @@ x-ollama: &ollama-base
     retries: 3
     start_period: 10s
   networks:
-    - multi-llm-network
+    - synergy-network
   restart: unless-stopped
 
 services:
@@ -78,6 +78,6 @@ volumes:
   ollama-creative:
 
 networks:
-  multi-llm-network:
-    name: multi-llm-network
+  synergy-network:
+    name: synergy-network
     external: true

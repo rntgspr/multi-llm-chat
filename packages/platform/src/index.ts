@@ -1,5 +1,5 @@
 /**
- * @multi-llm/platform
+ * @synergy/platform
  *
  * Camada de Manutenção - Auth, users, rooms, config
  */

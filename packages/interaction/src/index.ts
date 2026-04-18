@@ -1,5 +1,5 @@
 /**
- * @multi-llm/interaction
+ * @synergy/interaction
  *
  * Camada de Interação - Chat core, mensagens, streaming, canais
  */

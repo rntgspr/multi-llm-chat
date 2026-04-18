@@ -1,6 +1,6 @@
 # .github — Agentes, Instruções e Slash Commands
 
-Esta pasta contém as definições de agentes, instruções de código e slash commands do Spec-Kit para o projeto Multi-LLM Chat.
+Esta pasta contém as definições de agentes, instruções de código e slash commands do Spec-Kit para o projeto Synergy.
 
 > Toda a documentação de projeto (specs, plans, backlog, tech-debt, contracts, épicos) vive em `.specify/memory/` na raiz do repositório.
 

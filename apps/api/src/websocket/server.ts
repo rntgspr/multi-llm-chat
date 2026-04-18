@@ -1,10 +1,12 @@
 import { Server as SocketIOServer } from 'socket.io'
-import type { Server as HTTPServer } from 'node:http'
+
+import { logger } from '../lib/logger.js'
 import { sessionValidation } from './middleware/session.js'
 import { configureChatNamespace } from './namespaces/chat.js'
 import { configurePresenceNamespace } from './namespaces/presence.js'
 import { configureTypingNamespace } from './namespaces/typing.js'
-import { logger } from '../lib/logger.js'
+
+import type { Server as HTTPServer } from 'node:http'
 
 /**
  * Global Socket.io server instance
@@ -47,16 +49,10 @@ export function initializeSocketServer(httpServer: HTTPServer): SocketIOServer {
   // Default namespace connection event
   io.on('connection', (socket) => {
     const userId = socket.data.userId
-    logger.info(
-      { socketId: socket.id, userId },
-      'Client connected to default namespace',
-    )
+    logger.info({ socketId: socket.id, userId }, 'Client connected to default namespace')
 
     socket.on('disconnect', (reason) => {
-      logger.info(
-        { socketId: socket.id, userId, reason },
-        'Client disconnected from default namespace',
-      )
+      logger.info({ socketId: socket.id, userId, reason }, 'Client disconnected from default namespace')
     })
 
     socket.on('error', (error) => {
@@ -72,9 +68,7 @@ export function initializeSocketServer(httpServer: HTTPServer): SocketIOServer {
  */
 export function getSocketServer(): SocketIOServer {
   if (!io) {
-    throw new Error(
-      'Socket.io server not initialized. Call initializeSocketServer first.',
-    )
+    throw new Error('Socket.io server not initialized. Call initializeSocketServer first.')
   }
   return io
 }

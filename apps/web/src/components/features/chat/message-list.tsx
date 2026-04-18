@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer'
 import { useWebSocket } from '@/hooks/use-websocket'
 
-import type { Message } from '@multi-llm/types'
+import type { Message } from '@synergy/types'
 
 interface MessageListProps {
   roomId: string

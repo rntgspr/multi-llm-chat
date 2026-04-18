@@ -1,6 +1,6 @@
 import { getAssistant, modelsByAssistant } from './registry'
 
-import type { AssistantId, Message } from '@multi-llm/types'
+import type { AssistantId, Message } from '@synergy/types'
 
 interface OllamaMessage {
   role: 'system' | 'user' | 'assistant'

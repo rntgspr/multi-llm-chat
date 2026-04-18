@@ -1,7 +1,7 @@
-import { listAssistants, updateAssistantStatus } from '@multi-llm/interpretation'
+import { listAssistants, updateAssistantStatus } from '@synergy/interpretation'
 import { NextResponse } from 'next/server'
 
-import type { AssistantId, AssistantStatus } from '@multi-llm/types'
+import type { AssistantId, AssistantStatus } from '@synergy/types'
 
 interface AssistantHealth {
   id: AssistantId

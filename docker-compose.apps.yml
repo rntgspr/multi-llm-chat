@@ -1,4 +1,4 @@
-# Multi-LLM Chat - Application Services (Web + API)
+# Synergy Chat - Application Services (Web + API)
 #
 # Prerequisites: Infrastructure must be running first
 #   docker compose up -d
@@ -8,7 +8,7 @@
 #   docker compose -f docker-compose.apps.yml logs -f      # View logs
 #   docker compose -f docker-compose.apps.yml down         # Stop apps
 
-name: multi-llm-chat
+name: synergy-chat
 
 services:
   # ==========================================================================
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       target: dev
-    container_name: multi-llm-web
+    container_name: synergy-web
     ports:
       - "3000:3000"
     env_file:
@@ -34,7 +34,7 @@ services:
       - /app/apps/web/node_modules
       - /app/node_modules
     networks:
-      - multi-llm-network
+      - synergy-network
     restart: unless-stopped
 
   # ==========================================================================
@@ -45,7 +45,7 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
       target: dev
-    container_name: multi-llm-api
+    container_name: synergy-api
     ports:
       - "4000:4000"
     env_file:
@@ -60,10 +60,10 @@ services:
       - /app/apps/api/node_modules
       - /app/node_modules
     networks:
-      - multi-llm-network
+      - synergy-network
     restart: unless-stopped
 
 networks:
-  multi-llm-network:
-    name: multi-llm-network
+  synergy-network:
+    name: synergy-network
     external: true

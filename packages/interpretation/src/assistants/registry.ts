@@ -1,6 +1,6 @@
-import { assistantRepository } from '@multi-llm/db/repositories'
+import { assistantRepository } from '@synergy/db/repositories'
 
-import type { Assistant, AssistantId, AssistantStatus } from '@multi-llm/types'
+import type { Assistant, AssistantId, AssistantStatus } from '@synergy/types'
 
 interface AssistantConfig {
   id: string

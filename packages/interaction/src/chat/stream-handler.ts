@@ -1,7 +1,7 @@
 import { messageBus } from './message-bus'
 import { createTextContent, messageStore } from './message-store'
 
-import type { AssistantId, MessageId, RoomId } from '@multi-llm/types'
+import type { AssistantId, MessageId, RoomId } from '@synergy/types'
 
 /**
  * Generates a unique ID

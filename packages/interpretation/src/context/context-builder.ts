@@ -1,4 +1,4 @@
-import type { AssistantId, Message, RoomId } from '@multi-llm/types'
+import type { AssistantId, Message, RoomId } from '@synergy/types'
 
 interface ContextOptions {
   maxMessages?: number

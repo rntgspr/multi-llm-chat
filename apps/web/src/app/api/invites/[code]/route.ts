@@ -1,4 +1,4 @@
-import { getInvite, useInvite } from '@multi-llm/platform'
+import { getInvite, useInvite } from '@synergy/platform'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { auth } from '@/lib/auth'

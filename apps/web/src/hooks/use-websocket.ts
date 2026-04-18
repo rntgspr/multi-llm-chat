@@ -13,7 +13,7 @@ import {
   setTyping as wsSetTyping,
 } from '@/services/websocket'
 
-import type { Message, RoomId, TypingEvent, UserId } from '@multi-llm/types'
+import type { Message, RoomId, TypingEvent, UserId } from '@synergy/types'
 
 interface UseWebSocketReturn {
   connected: boolean

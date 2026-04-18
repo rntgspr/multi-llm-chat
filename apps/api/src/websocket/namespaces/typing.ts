@@ -1,6 +1,7 @@
+import { logger } from '../../lib/logger.js'
+
 import type { Server as SocketIOServer } from 'socket.io'
 import type { SocketData } from '../middleware/session.js'
-import { logger } from '../../lib/logger.js'
 
 /**
  * Typing namespace event payloads
@@ -21,10 +22,7 @@ export function configureTypingNamespace(io: SocketIOServer) {
 
   typingNamespace.on('connection', (socket) => {
     const userId = (socket.data as SocketData).userId
-    logger.info(
-      { socketId: socket.id, userId, namespace: '/typing' },
-      'Client connected to /typing namespace',
-    )
+    logger.info({ socketId: socket.id, userId, namespace: '/typing' }, 'Client connected to /typing namespace')
 
     // Handle typing:start event
     socket.on('typing:start', (event: TypingStartEvent) => {
@@ -59,7 +57,7 @@ export function configureTypingNamespace(io: SocketIOServer) {
     socket.on('disconnect', (reason) => {
       logger.info(
         { socketId: socket.id, userId, reason, namespace: '/typing' },
-        'Client disconnected from /typing namespace',
+        'Client disconnected from /typing namespace'
       )
     })
   })

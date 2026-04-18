@@ -1,6 +1,7 @@
-import type { Socket } from 'socket.io'
-import { extractTokenFromSocket, verifyJWT } from '../../middlewares/auth.js'
 import { logger } from '../../lib/logger.js'
+import { extractTokenFromSocket, verifyJWT } from '../../middlewares/auth.js'
+
+import type { Socket } from 'socket.io'
 
 /**
  * Extended socket data with session information
@@ -16,18 +17,12 @@ export interface SocketData {
  * WebSocket session validation middleware
  * Verifies JWT token and attaches user data to socket
  */
-export async function sessionValidation(
-  socket: Socket,
-  next: (err?: Error) => void,
-) {
+export async function sessionValidation(socket: Socket, next: (err?: Error) => void) {
   try {
     const token = extractTokenFromSocket(socket.handshake)
 
     if (!token) {
-      logger.warn(
-        { socketId: socket.id },
-        'Connection rejected: No authentication token provided',
-      )
+      logger.warn({ socketId: socket.id }, 'Connection rejected: No authentication token provided')
       return next(new Error('Authentication token required'))
     }
 
@@ -37,20 +32,14 @@ export async function sessionValidation(
       const userId = token.replace('temp-token-', '')
       socket.data.userId = userId
       socket.data.sessionId = `session-${userId}`
-      logger.info(
-        { socketId: socket.id, userId },
-        'WebSocket authenticated (dev mode)',
-      )
+      logger.info({ socketId: socket.id, userId }, 'WebSocket authenticated (dev mode)')
       return next()
     }
 
     const payload = await verifyJWT(token)
 
     if (!payload || !payload.sub) {
-      logger.warn(
-        { socketId: socket.id },
-        'Connection rejected: Invalid or expired token',
-      )
+      logger.warn({ socketId: socket.id }, 'Connection rejected: Invalid or expired token')
       return next(new Error('Invalid token'))
     }
 
@@ -60,10 +49,7 @@ export async function sessionValidation(
     socket.data.email = payload.email
     socket.data.name = payload.name
 
-    logger.info(
-      { socketId: socket.id, userId: payload.sub },
-      'WebSocket session validated',
-    )
+    logger.info({ socketId: socket.id, userId: payload.sub }, 'WebSocket session validated')
 
     next()
   } catch (error) {

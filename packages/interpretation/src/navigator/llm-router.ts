@@ -1,6 +1,6 @@
 import { listAssistants } from '../assistants/registry'
 
-import type { Message, RoutingPlan } from '@multi-llm/types'
+import type { Message, RoutingPlan } from '@synergy/types'
 import type { ConversationContext } from './navigator'
 
 const NAVIGATOR_URL = process.env.OLLAMA_NAVIGATOR_URL || 'http://localhost:11430'

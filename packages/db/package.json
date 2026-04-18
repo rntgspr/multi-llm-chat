@@ -1,5 +1,5 @@
 {
-  "name": "@multi-llm/db",
+  "name": "@synergy/db",
   "version": "0.1.0",
   "type": "module",
   "exports": {
@@ -8,7 +8,7 @@
     "./lib/*": "./src/lib/*.ts"
   },
   "dependencies": {
-    "@multi-llm/types": "workspace:*",
+    "@synergy/types": "workspace:*",
     "surrealdb": "^2.0.3"
   },
   "devDependencies": {

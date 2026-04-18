@@ -1,5 +1,98 @@
 
 
-> @multi-llm/interpretation@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/interpretation
+> @synergy/interpretation@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/interpretation
 > tsc --noEmit
 
+[96msrc/assistants/ollama-adapter.ts[0m:[93m54[0m:[93m28[0m - [91merror[0m[90m TS2339: [0mProperty 'endpoint' does not exist on type 'Promise<Assistant | undefined>'.
+
+[7m54[0m   const url = `${assistant.endpoint}/api/chat`
+[7m  [0m [91m                           ~~~~~~~~[0m
+
+[96msrc/assistants/ollama-adapter.ts[0m:[93m56[0m:[93m45[0m - [91merror[0m[90m TS2339: [0mProperty 'name' does not exist on type 'Promise<Assistant | undefined>'.
+
+[7m56[0m   const systemPrompt = `You are ${assistant.name}. ${assistant.description}.
+[7m  [0m [91m                                            ~~~~[0m
+
+[96msrc/assistants/ollama-adapter.ts[0m:[93m56[0m:[93m64[0m - [91merror[0m[90m TS2339: [0mProperty 'description' does not exist on type 'Promise<Assistant | undefined>'.
+
+[7m56[0m   const systemPrompt = `You are ${assistant.name}. ${assistant.description}.
+[7m  [0m [91m                                                               ~~~~~~~~~~~[0m
+
+[96msrc/assistants/ollama-adapter.ts[0m:[93m65[0m:[93m59[0m - [91merror[0m[90m TS2339: [0mProperty 'name' does not exist on type 'Promise<Assistant | undefined>'.
+
+[7m65[0m   console.log(`[OllamaAdapter] Streaming from ${assistant.name} at ${url}`)
+[7m  [0m [91m                                                          ~~~~[0m
+
+[96msrc/assistants/ollama-adapter.ts[0m:[93m104[0m:[93m65[0m - [91merror[0m[90m TS2339: [0mProperty 'name' does not exist on type 'Promise<Assistant | undefined>'.
+
+[7m104[0m   console.log(`[OllamaAdapter] Stream complete from ${assistant.name}`)
+[7m   [0m [91m                                                                ~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m60[0m:[93m42[0m - [91merror[0m[90m TS2345: [0mArgument of type '{ id: string; name: string; description: string; avatarUrl?: string | undefined; endpoint: string; status: AssistantStatus; }' is not assignable to parameter of type 'CreateAssistantInput'.
+  Type '{ id: string; name: string; description: string; avatarUrl?: string | undefined; endpoint: string; status: AssistantStatus; }' is missing the following properties from type 'CreateAssistantInput': model, provider, config
+
+[7m60[0m         await assistantRepository.create(assistantData)
+[7m  [0m [91m                                         ~~~~~~~~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m76[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/db/assistant").Assistant[]' is not assignable to type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/index").Assistant[]'.
+  Type 'Assistant' is missing the following properties from type 'Assistant': description, endpoint, status
+
+[7m76[0m     return await assistantRepository.findAll()
+[7m  [0m [91m    ~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m89[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/db/assistant").Assistant[]' is not assignable to type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/index").Assistant[]'.
+  Type 'Assistant' is missing the following properties from type 'Assistant': description, endpoint, status
+
+[7m89[0m     return all.filter((a) => a.status === 'online')
+[7m  [0m [91m    ~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m89[0m:[93m32[0m - [91merror[0m[90m TS2339: [0mProperty 'status' does not exist on type 'Assistant'.
+
+[7m89[0m     return all.filter((a) => a.status === 'online')
+[7m  [0m [91m                               ~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m102[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/db/assistant").Assistant | undefined' is not assignable to type 'import("/Users/gaspar/workspace/multi-llm-chat/packages/types/src/index").Assistant | undefined'.
+  Type 'Assistant' is missing the following properties from type 'Assistant': description, endpoint, status
+
+[7m102[0m     return assistant ?? undefined
+[7m   [0m [91m    ~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m114[0m:[93m53[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'status' does not exist in type 'Partial<Omit<Assistant, "id" | "createdAt">>'.
+
+[7m114[0m     await assistantRepository.update(assistantId, { status })
+[7m   [0m [91m                                                    ~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m130[0m:[93m38[0m - [91merror[0m[90m TS2345: [0mArgument of type 'Omit<Assistant, "id"> & { id: string; }' is not assignable to parameter of type 'CreateAssistantInput'.
+  Type 'Omit<Assistant, "id"> & { id: string; }' is missing the following properties from type 'CreateAssistantInput': model, provider, config
+
+[7m130[0m     await assistantRepository.create(assistant)
+[7m   [0m [91m                                     ~~~~~~~~~[0m
+
+[96msrc/assistants/registry.ts[0m:[93m160[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'status' does not exist on type 'Assistant'.
+
+[7m160[0m     return assistant?.status === 'online'
+[7m   [0m [91m                      ~~~~~~[0m
+
+[96msrc/navigator/llm-router.ts[0m:[93m59[0m:[93m28[0m - [91merror[0m[90m TS2339: [0mProperty 'find' does not exist on type 'Promise<Assistant[]>'.
+
+[7m59[0m       const a = assistants.find((x) => x.id === id)
+[7m  [0m [91m                           ~~~~[0m
+
+  [96msrc/navigator/llm-router.ts[0m:[93m59[0m:[93m28[0m
+    [7m59[0m       const a = assistants.find((x) => x.id === id)
+    [7m  [0m [96m                           ~~~~[0m
+    Did you forget to use 'await'?
+
+[96msrc/navigator/llm-router.ts[0m:[93m59[0m:[93m34[0m - [91merror[0m[90m TS7006: [0mParameter 'x' implicitly has an 'any' type.
+
+[7m59[0m       const a = assistants.find((x) => x.id === id)
+[7m  [0m [91m                                 ~[0m
+
+
+Found 15 errors in 3 files.
+
+Errors  Files
+     5  src/assistants/ollama-adapter.ts[90m:54[0m
+     8  src/assistants/registry.ts[90m:60[0m
+     2  src/navigator/llm-router.ts[90m:59[0m
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 2.[39m

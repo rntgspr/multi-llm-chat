@@ -11,7 +11,7 @@ import { MessageInput } from './message-input'
 import { MessageList } from './message-list'
 import { SidePanel } from './side-panel'
 
-import type { Room } from '@multi-llm/types'
+import type { Room } from '@synergy/types'
 
 interface User {
   id: string

@@ -1,6 +1,7 @@
+import { logger } from '../../lib/logger.js'
+
 import type { Server as SocketIOServer } from 'socket.io'
 import type { SocketData } from '../middleware/session.js'
-import { logger } from '../../lib/logger.js'
 
 /**
  * User status types
@@ -22,10 +23,7 @@ export function configurePresenceNamespace(io: SocketIOServer) {
 
   presenceNamespace.on('connection', (socket) => {
     const userId = (socket.data as SocketData).userId
-    logger.info(
-      { socketId: socket.id, userId, namespace: '/presence' },
-      'Client connected to /presence namespace',
-    )
+    logger.info({ socketId: socket.id, userId, namespace: '/presence' }, 'Client connected to /presence namespace')
 
     // Automatically set user as online
     presenceNamespace.emit('status:changed', {
@@ -51,7 +49,7 @@ export function configurePresenceNamespace(io: SocketIOServer) {
     socket.on('disconnect', (reason) => {
       logger.info(
         { socketId: socket.id, userId, reason, namespace: '/presence' },
-        'Client disconnected from /presence namespace',
+        'Client disconnected from /presence namespace'
       )
 
       // Set user as offline

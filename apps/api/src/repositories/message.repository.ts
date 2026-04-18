@@ -4,7 +4,7 @@ import { getDB } from '../lib/db'
 import { handleDBError, toStringId } from '../lib/db-errors'
 import { query, queryOne } from '../lib/db-helpers'
 
-import type { CreateMessageInput, Message } from '@multi-llm/types/db'
+import type { CreateMessageInput, Message } from '@synergy/types/db'
 
 export class MessageRepository {
   private table = new Table('message')

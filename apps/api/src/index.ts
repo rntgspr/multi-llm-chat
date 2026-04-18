@@ -1,16 +1,13 @@
+import { createServer } from 'node:http'
 import { getRequestListener } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger as honoLogger } from 'hono/logger'
-import { createServer } from 'node:http'
 
-import { initializeRedis, shutdownRedis } from './lib/redis-init.js'
-import {
-  initializeSocketServer,
-  shutdownSocketServer,
-} from './websocket/server.js'
-import { logger } from './lib/logger.js'
 import { correlationId } from './lib/correlation-id.js'
+import { logger } from './lib/logger.js'
+import { initializeRedis, shutdownRedis } from './lib/redis-init.js'
+import { initializeSocketServer, shutdownSocketServer } from './websocket/server.js'
 
 const app = new Hono()
 

@@ -57,10 +57,7 @@ export type ActionResult<T = unknown> = ActionSuccess<T> | ActionError
 /**
  * Helper to create success result
  */
-export function actionSuccess<T>(
-  data: T,
-  correlationId?: string,
-): ActionSuccess<T> {
+export function actionSuccess<T>(data: T, correlationId?: string): ActionSuccess<T> {
   return { success: true, data, correlationId }
 }
 
@@ -71,7 +68,7 @@ export function actionError(
   error: ErrorCode,
   message: string,
   details?: Record<string, unknown>,
-  correlationId?: string,
+  correlationId?: string
 ): ActionError {
   return { success: false, error, message, details, correlationId }
 }

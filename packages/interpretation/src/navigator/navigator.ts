@@ -2,7 +2,7 @@ import { listAssistants } from '../assistants/registry'
 import { routeWithLLM } from './llm-router'
 import { applyRules } from './routing-rules'
 
-import type { AssistantId, Message, RoutingPlan } from '@multi-llm/types'
+import type { AssistantId, Message, RoutingPlan } from '@synergy/types'
 
 export interface ConversationContext {
   recentMessages: Message[]

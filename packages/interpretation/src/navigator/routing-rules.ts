@@ -1,4 +1,4 @@
-import type { AssistantId, Message, RoutingPlan } from '@multi-llm/types'
+import type { AssistantId, Message, RoutingPlan } from '@synergy/types'
 import type { ConversationContext } from './navigator'
 
 interface RoutingRule {

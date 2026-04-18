@@ -1,4 +1,4 @@
-# Multi-LLM Chat - Hono API + WebSocket Service
+# Synergy - Hono API + WebSocket Service
 FROM node:20-alpine AS base
 
 # Install dependencies only when needed

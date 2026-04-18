@@ -5,9 +5,9 @@
 
 'use server'
 
-import { getPublisher } from '@multi-llm/platform'
+import { getPublisher } from '@synergy/platform'
 
-import type { MessageSentPayload, UserStatusChangedPayload } from '@multi-llm/platform'
+import type { MessageSentPayload, UserStatusChangedPayload } from '@synergy/platform'
 
 /**
  * Example: Publish a chat message sent event

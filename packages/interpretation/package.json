@@ -1,5 +1,5 @@
 {
-  "name": "@multi-llm/interpretation",
+  "name": "@synergy/interpretation",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,8 +14,8 @@
     "check": "biome check --write ."
   },
   "dependencies": {
-    "@multi-llm/db": "workspace:*",
-    "@multi-llm/types": "workspace:*"
+    "@synergy/db": "workspace:*",
+    "@synergy/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20"

@@ -10,11 +10,10 @@ import type {
   RoomId,
   TypingEvent,
   UserId,
-} from '@multi-llm/types'
+} from '@synergy/types'
 
 let socket: Socket | null = null
-let connectionStatus: 'connected' | 'disconnected' | 'reconnecting' =
-  'disconnected'
+let connectionStatus: 'connected' | 'disconnected' | 'reconnecting' = 'disconnected'
 let reconnectAttempts = 0
 const MAX_RECONNECT_ATTEMPTS = 5
 
@@ -26,13 +25,13 @@ async function getSessionToken(): Promise<string | null> {
   try {
     const response = await fetch('/api/auth/session')
     const session = await response.json()
-    
+
     // TODO: Configure NextAuth to include JWT token in session
     // For now, return user.id as a temporary token if user exists
     if (session?.user?.id) {
       return `temp-token-${session.user.id}`
     }
-    
+
     return null
   } catch (error) {
     console.error('[WS Client] Failed to get session token:', error)

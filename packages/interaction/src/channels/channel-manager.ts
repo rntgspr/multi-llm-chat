@@ -1,4 +1,4 @@
-import type { ChannelId, ChannelType, IncomingMessage, OutgoingMessage } from '@multi-llm/types'
+import type { ChannelId, ChannelType, IncomingMessage, OutgoingMessage } from '@synergy/types'
 import type { Channel, ChannelConfig } from './channel'
 
 type MessageHandler = (msg: IncomingMessage) => void

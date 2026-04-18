@@ -1,6 +1,6 @@
-import { inviteRepository, roomRepository } from '@multi-llm/db/repositories'
+import { inviteRepository, roomRepository } from '@synergy/db/repositories'
 
-import type { AssistantId, Invite, Room, RoomId, UserId } from '@multi-llm/types'
+import type { AssistantId, Invite, Room, RoomId, UserId } from '@synergy/types'
 
 /**
  * Generates a random invite code

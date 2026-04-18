@@ -3,7 +3,7 @@
  * Establishes Redis connections and performs health check on startup
  */
 
-import { healthCheck } from '@multi-llm/platform'
+import { healthCheck } from '@synergy/platform'
 
 let isInitialized = false
 

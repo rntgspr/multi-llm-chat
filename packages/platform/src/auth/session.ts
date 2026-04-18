@@ -1,4 +1,4 @@
-import type { UserId } from '@multi-llm/types'
+import type { UserId } from '@synergy/types'
 
 /**
  * Session management placeholder.

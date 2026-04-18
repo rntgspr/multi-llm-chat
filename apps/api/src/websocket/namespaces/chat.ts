@@ -1,6 +1,7 @@
+import { logger } from '../../lib/logger.js'
+
 import type { Server as SocketIOServer } from 'socket.io'
 import type { SocketData } from '../middleware/session.js'
-import { logger } from '../../lib/logger.js'
 
 /**
  * Chat namespace event payloads
@@ -21,10 +22,7 @@ export function configureChatNamespace(io: SocketIOServer) {
 
   chatNamespace.on('connection', (socket) => {
     const userId = (socket.data as SocketData).userId
-    logger.info(
-      { socketId: socket.id, userId, namespace: '/chat' },
-      'Client connected to /chat namespace',
-    )
+    logger.info({ socketId: socket.id, userId, namespace: '/chat' }, 'Client connected to /chat namespace')
 
     // Handle room:join event
     socket.on('room:join', async (event: RoomJoinEvent) => {
@@ -46,10 +44,7 @@ export function configureChatNamespace(io: SocketIOServer) {
 
         await socket.join(roomId)
 
-        logger.info(
-          { socketId: socket.id, userId, roomId },
-          'User joined room (authorization verified)',
-        )
+        logger.info({ socketId: socket.id, userId, roomId }, 'User joined room (authorization verified)')
 
         // Broadcast to other room members
         socket.to(roomId).emit('member:joined', {
@@ -64,10 +59,7 @@ export function configureChatNamespace(io: SocketIOServer) {
           timestamp: new Date().toISOString(),
         })
       } catch (error) {
-        logger.error(
-          { socketId: socket.id, userId, roomId, error },
-          'Failed to join room',
-        )
+        logger.error({ socketId: socket.id, userId, roomId, error }, 'Failed to join room')
         socket.emit('room:join:error', {
           roomId,
           error: 'INTERNAL_ERROR',
@@ -95,7 +87,7 @@ export function configureChatNamespace(io: SocketIOServer) {
     socket.on('disconnect', (reason) => {
       logger.info(
         { socketId: socket.id, userId, reason, namespace: '/chat' },
-        'Client disconnected from /chat namespace',
+        'Client disconnected from /chat namespace'
       )
     })
   })

@@ -1,4 +1,4 @@
-import { messageRepository } from '@multi-llm/db/repositories'
+import { messageRepository } from '@synergy/db/repositories'
 
 import type {
   AssistantId,
@@ -9,7 +9,7 @@ import type {
   RoomId,
   SenderType,
   UserId,
-} from '@multi-llm/types'
+} from '@synergy/types'
 
 interface CreateMessageParams {
   roomId: RoomId

@@ -5,7 +5,7 @@ import { Bot, Loader2, MessageSquare, Trash2, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import type { Room } from '@multi-llm/types'
+import type { Room } from '@synergy/types'
 
 async function fetchRooms(): Promise<{ rooms: Room[] }> {
   const response = await fetch('/api/rooms')
@@ -125,11 +125,7 @@ export function RoomList() {
             className="absolute top-4 right-4 p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Delete room"
           >
-            {deletingRoomId === room.id ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Trash2 className="h-4 w-4" />
-            )}
+            {deletingRoomId === room.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
           </button>
         </div>
       ))}

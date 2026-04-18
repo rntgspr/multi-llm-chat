@@ -1,5 +1,5 @@
 
 
-> @multi-llm/interaction@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/interaction
+> @synergy/interaction@0.1.0 typecheck /Users/gaspar/workspace/multi-llm-chat/packages/interaction
 > tsc --noEmit
 

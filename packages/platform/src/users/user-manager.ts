@@ -1,6 +1,6 @@
-import { userRepository } from '@multi-llm/db/repositories'
+import { userRepository } from '@synergy/db/repositories'
 
-import type { User, UserId } from '@multi-llm/types'
+import type { User, UserId } from '@synergy/types'
 
 /**
  * Creates a new user

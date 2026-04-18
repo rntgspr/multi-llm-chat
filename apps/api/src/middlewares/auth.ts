@@ -1,4 +1,5 @@
 import * as jose from 'jose'
+
 import { logger } from '../lib/logger.js'
 
 /**
@@ -50,11 +51,9 @@ export async function verifyJWT(token: string): Promise<JWTPayload | null> {
  * Extract token from socket handshake
  * Checks auth.token first, then query.token
  */
-export function extractTokenFromSocket(
-  handshake: {
-    auth?: { token?: string }
-    query?: { token?: string }
-  },
-): string | null {
+export function extractTokenFromSocket(handshake: {
+  auth?: { token?: string }
+  query?: { token?: string }
+}): string | null {
   return handshake.auth?.token || (handshake.query?.token as string) || null
 }

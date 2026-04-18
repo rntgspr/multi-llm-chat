@@ -4,7 +4,7 @@ import { getDB } from '../lib/db'
 import { handleDBError, toStringId } from '../lib/db-errors'
 import { query, queryOne } from '../lib/db-helpers'
 
-import type { CreateInviteInput, Invite } from '@multi-llm/types/db'
+import type { CreateInviteInput, Invite } from '@synergy/types/db'
 
 export class InviteRepository {
   private table = new Table('invite')

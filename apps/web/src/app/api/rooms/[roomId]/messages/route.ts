@@ -1,12 +1,12 @@
-import { createFileContent, createImageContent, createTextContent, messageStore } from '@multi-llm/interaction'
-import { navigator, sendToAssistant } from '@multi-llm/interpretation'
-import { getRoom } from '@multi-llm/platform'
+import { createFileContent, createImageContent, createTextContent, messageStore } from '@synergy/interaction'
+import { navigator, sendToAssistant } from '@synergy/interpretation'
+import { getRoom } from '@synergy/platform'
 import { type NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 
 import { auth } from '@/lib/auth'
 
-import type { MessageContent } from '@multi-llm/types'
+import type { MessageContent } from '@synergy/types'
 
 interface RouteParams {
   params: Promise<{ roomId: string }>

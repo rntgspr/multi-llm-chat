@@ -1,5 +1,5 @@
 /**
- * @multi-llm/interpretation
+ * @synergy/interpretation
  *
  * Camada de Interpretação - Navigator, assistentes, contexto
  */

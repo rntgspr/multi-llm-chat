@@ -4,7 +4,7 @@ import { getDB } from '../lib/db'
 import { handleDBError, toStringId } from '../lib/db-errors'
 import { query, queryOne } from '../lib/db-helpers'
 
-import type { CreateRoomInput, Room, UpdateRoomInput } from '@multi-llm/types/db'
+import type { CreateRoomInput, Room, UpdateRoomInput } from '@synergy/types/db'
 
 export class RoomRepository {
   private table = new Table('room')

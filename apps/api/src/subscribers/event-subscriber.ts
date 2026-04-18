@@ -3,18 +3,19 @@
  * Subscribes to Redis Pub/Sub events and broadcasts them to WebSocket clients
  */
 
-import { CHANNELS, getSubscriber } from '@multi-llm/platform'
+import { CHANNELS, getSubscriber } from '@synergy/platform'
+
+import { createCorrelatedLogger, logger } from '../lib/logger.js'
+import { getSocketServer } from '../websocket/server.js'
+
 import type {
+  MessageDeletedPayload,
   MessageSentPayload,
   MessageUpdatedPayload,
-  MessageDeletedPayload,
+  PubSubEnvelope,
   RoomMemberJoinedPayload,
   RoomMemberLeftPayload,
-  PubSubEnvelope,
-} from '@multi-llm/platform'
-
-import { getSocketServer } from '../websocket/server.js'
-import { logger, createCorrelatedLogger } from '../lib/logger.js'
+} from '@synergy/platform'
 
 /**
  * Subscribe to chat.message.sent and broadcast to /chat namespace
@@ -29,10 +30,7 @@ async function subscribeToMessageSent(): Promise<() => void> {
       const correlationId = message.correlationId || message.messageId
 
       const log = createCorrelatedLogger(correlationId)
-      log.info(
-        { roomId, messageId, userId, channel: message.channel },
-        'Broadcasting message:new to WebSocket clients',
-      )
+      log.info({ roomId, messageId, userId, channel: message.channel }, 'Broadcasting message:new to WebSocket clients')
 
       try {
         const io = getSocketServer()
@@ -52,7 +50,7 @@ async function subscribeToMessageSent(): Promise<() => void> {
       } catch (error) {
         log.error({ error, roomId, messageId }, 'Failed to broadcast message')
       }
-    },
+    }
   )
 
   logger.info('Subscribed to chat.message.sent')
@@ -72,10 +70,7 @@ async function subscribeToMemberJoined(): Promise<() => void> {
       const correlationId = message.correlationId || message.messageId
 
       const log = createCorrelatedLogger(correlationId)
-      log.info(
-        { roomId, userId, channel: message.channel },
-        'Broadcasting member:joined to WebSocket clients',
-      )
+      log.info({ roomId, userId, channel: message.channel }, 'Broadcasting member:joined to WebSocket clients')
 
       try {
         const io = getSocketServer()
@@ -92,7 +87,7 @@ async function subscribeToMemberJoined(): Promise<() => void> {
       } catch (error) {
         log.error({ error, roomId, userId }, 'Failed to broadcast member:joined')
       }
-    },
+    }
   )
 
   logger.info('Subscribed to room.member.joined')
@@ -112,10 +107,7 @@ async function subscribeToMemberLeft(): Promise<() => void> {
       const correlationId = message.correlationId || message.messageId
 
       const log = createCorrelatedLogger(correlationId)
-      log.info(
-        { roomId, userId, channel: message.channel },
-        'Broadcasting member:left to WebSocket clients',
-      )
+      log.info({ roomId, userId, channel: message.channel }, 'Broadcasting member:left to WebSocket clients')
 
       try {
         const io = getSocketServer()
@@ -132,7 +124,7 @@ async function subscribeToMemberLeft(): Promise<() => void> {
       } catch (error) {
         log.error({ error, roomId, userId }, 'Failed to broadcast member:left')
       }
-    },
+    }
   )
 
   logger.info('Subscribed to room.member.left')
@@ -145,11 +137,7 @@ async function subscribeToMemberLeft(): Promise<() => void> {
 export async function subscribeToAllEvents(): Promise<() => void> {
   logger.info('Starting all event subscribers...')
 
-  const unsubscribes = await Promise.all([
-    subscribeToMessageSent(),
-    subscribeToMemberJoined(),
-    subscribeToMemberLeft(),
-  ])
+  const unsubscribes = await Promise.all([subscribeToMessageSent(), subscribeToMemberJoined(), subscribeToMemberLeft()])
 
   logger.info('All event subscribers initialized')
 

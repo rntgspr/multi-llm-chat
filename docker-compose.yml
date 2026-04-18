@@ -1,4 +1,4 @@
-# Multi-LLM Chat - Infrastructure Services (DB + Cache)
+# Synergy Chat - Infrastructure Services (DB + Cache)
 #
 # Usage:
 #   docker compose up -d                    # Start infra only
@@ -11,7 +11,7 @@
 # For LLM services (Ollama):
 #   docker compose -f docker-compose.llm.yml up -d
 
-name: multi-llm-chat
+name: synergy-chat
 
 services:
   # ==========================================================================
@@ -19,7 +19,7 @@ services:
   # ==========================================================================
   surrealdb:
     image: surrealdb/surrealdb:v2
-    container_name: multi-llm-surrealdb
+    container_name: synergy-surrealdb
     user: "0:0"
     ports:
       - "8000:8000"
@@ -30,12 +30,12 @@ services:
       - --pass=root
       - rocksdb:/data/surrealdb.db
     environment:
-      - SURREAL_NAMESPACE=multi_llm_chat
+      - SURREAL_NAMESPACE=synergy_chat
       - SURREAL_DATABASE=chat
     volumes:
       - surrealdb_data:/data
     networks:
-      - multi-llm-network
+      - synergy-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 15s
@@ -49,13 +49,13 @@ services:
   # ==========================================================================
   redis:
     image: redis:7-alpine
-    container_name: multi-llm-redis
+    container_name: synergy-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - multi-llm-network
+      - synergy-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 15s
@@ -71,6 +71,6 @@ volumes:
     driver: local
 
 networks:
-  multi-llm-network:
-    name: multi-llm-network
+  synergy-network:
+    name: synergy-network
     driver: bridge

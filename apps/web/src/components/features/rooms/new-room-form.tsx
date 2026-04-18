@@ -5,7 +5,7 @@ import { Bot, Check, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import type { Assistant, Room } from '@multi-llm/types'
+import type { Assistant, Room } from '@synergy/types'
 
 async function fetchAssistants(): Promise<{ assistants: Assistant[] }> {
   const response = await fetch('/api/assistants')

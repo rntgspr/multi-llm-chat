@@ -3,7 +3,7 @@
  * Demonstrates how to use the Redis cache client
  */
 
-import { getCacheClient } from '@multi-llm/platform'
+import { getCacheClient } from '@synergy/platform'
 
 /**
  * Example: Cache user preferences
